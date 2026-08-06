@@ -15,7 +15,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-navy-primary text-white relative overflow-hidden">
+    <footer className="bg-navy-primary text-white relative overflow-hidden print:hidden">
       {/* Background grid pattern */}
       <div className="absolute inset-0 grid-pattern opacity-50" />
 

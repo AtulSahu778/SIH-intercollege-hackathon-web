@@ -21,7 +21,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [_isHeroSection, setIsHeroSection] = useState(true);
+  const [, setIsHeroSection] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function Navbar() {
     setIsOpen(false);
   }, [pathname]);
 
-  const _isHomePage = pathname === "/";
+
 
   return (
     <>

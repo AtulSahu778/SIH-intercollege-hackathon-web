@@ -104,7 +104,7 @@ export default function RegistrationForm() {
     },
   });
 
-  const { handleSubmit, watch, reset, trigger, formState: { errors: _errors } } = methods;
+  const { handleSubmit, watch, reset, trigger } = methods;
 
   // ── Load autosaved draft ──────────────────────────────────────────────────
   useEffect(() => {
@@ -134,7 +134,8 @@ export default function RegistrationForm() {
   const formValues = watch();
   useEffect(() => {
     const timer = setTimeout(() => {
-      const { presentationFile: _presentationFile, ...saveable } = formValues;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { presentationFile: _, ...saveable } = formValues;
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(saveable));
     }, 800);
     return () => clearTimeout(timer);

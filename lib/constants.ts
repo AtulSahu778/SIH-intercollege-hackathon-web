@@ -1,0 +1,187 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// College Info
+// ─────────────────────────────────────────────────────────────────────────────
+export const COLLEGE = {
+  name: "St. Xavier's College, Ranchi",
+  shortName: "SXC Ranchi",
+  tagline: "Excellence, Knowledge, Leadership",
+  iqac: "Internal Quality Assurance Cell (IQAC)",
+  address: "P.O. Box 7, Ranchi, Jharkhand – 834001",
+  email: "iqac@sxcranchi.ac.in",
+  phone: "+91-651-2360077",
+  website: "https://sxcranchi.ac.in",
+  estYear: "1944",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hackathon Info
+// ─────────────────────────────────────────────────────────────────────────────
+export const HACKATHON = {
+  name: "Internal Smart India Hackathon 2026",
+  shortName: "iSIH 2026",
+  year: "2026",
+  edition: "SIH 2026 Internal Selection Round",
+  sihUrl: "https://sih.gov.in",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Timeline
+// ─────────────────────────────────────────────────────────────────────────────
+export const TIMELINE = [
+  {
+    id: 1,
+    phase: "Registrations Open",
+    date: "Aug 10, 2026",
+    description: "Team leaders register their teams on this portal.",
+    status: "upcoming",
+    icon: "ClipboardList",
+  },
+  {
+    id: 2,
+    phase: "Registration Deadline",
+    date: "Sep 5, 2026",
+    description: "Last date to submit team registrations and idea presentations.",
+    status: "upcoming",
+    icon: "Clock",
+  },
+  {
+    id: 3,
+    phase: "Internal Hackathon",
+    date: "Sep 20–21, 2026",
+    description: "48-hour on-campus hackathon. All registered teams participate.",
+    status: "upcoming",
+    icon: "Zap",
+  },
+  {
+    id: 4,
+    phase: "Evaluation & Shortlisting",
+    date: "Sep 25, 2026",
+    description: "Expert panel evaluates projects. Top teams shortlisted.",
+    status: "upcoming",
+    icon: "CheckCircle",
+  },
+  {
+    id: 5,
+    phase: "SIH 2026 Nomination",
+    date: "Oct 1, 2026",
+    description: "Shortlisted teams nominated to represent SXC at SIH 2026.",
+    status: "upcoming",
+    icon: "Trophy",
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Departments / Streams
+// ─────────────────────────────────────────────────────────────────────────────
+export const DEPARTMENTS = [
+  "B.Sc. Computer Science",
+  "B.Sc. Information Technology",
+  "B.Sc. Electronics",
+  "B.Sc. Mathematics",
+  "B.Sc. Physics",
+  "B.Sc. Chemistry",
+  "B.Sc. Botany",
+  "B.Sc. Zoology",
+  "B.Sc. Biotechnology",
+  "B.Com. (Honours)",
+  "B.Com. (General)",
+  "B.A. Economics",
+  "B.A. English",
+  "B.A. History",
+  "B.A. Philosophy",
+  "B.A. Political Science",
+  "B.A. Psychology",
+  "B.A. Sociology",
+  "B.A. Hindi",
+  "BCA",
+  "M.Sc. Computer Science",
+  "M.Sc. Mathematics",
+  "M.A. Economics",
+  "MBA",
+  "Other",
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Academic Years
+// ─────────────────────────────────────────────────────────────────────────────
+export const ACADEMIC_YEARS = [
+  "First Year (1st)",
+  "Second Year (2nd)",
+  "Third Year (3rd)",
+  "Fourth Year (4th)",
+  "Post Graduate (PG)",
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hackathon Categories
+// ─────────────────────────────────────────────────────────────────────────────
+export const CATEGORIES = [
+  { value: "software", label: "Software", description: "Apps, platforms, AI/ML solutions" },
+  { value: "hardware", label: "Hardware", description: "IoT, embedded systems, robotics" },
+  { value: "student_innovation", label: "Student Innovation", description: "Novel ideas & research prototypes" },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Validation Constants
+// ─────────────────────────────────────────────────────────────────────────────
+export const VALIDATION = {
+  TEAM_SIZE: 6,
+  MIN_FEMALE_MEMBERS: 2,
+  MAX_PDF_SIZE_MB: 10,
+  MAX_PDF_SIZE_BYTES: 10 * 1024 * 1024,
+  MAX_DESCRIPTION_WORDS: 300,
+  TEAM_ID_PREFIX: "SIH-2026",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Feature Cards
+// ─────────────────────────────────────────────────────────────────────────────
+export const FEATURES = [
+  {
+    icon: "Lightbulb",
+    title: "Innovation-First",
+    description: "Tackle real-world problems using technology, creativity, and teamwork.",
+    color: "from-orange-500/20 to-orange-600/10",
+    iconColor: "text-accent-orange",
+  },
+  {
+    icon: "Users",
+    title: "Internal Hackathon",
+    description: "A rigorous selection round held on-campus before SIH 2026 nominations.",
+    color: "from-cyan-500/20 to-cyan-600/10",
+    iconColor: "text-accent-cyan",
+  },
+  {
+    icon: "Target",
+    title: "Problem Solving",
+    description: "Work on curated problem statements aligned with government & industry needs.",
+    color: "from-blue-500/20 to-blue-600/10",
+    iconColor: "text-blue-400",
+  },
+  {
+    icon: "GraduationCap",
+    title: "Expert Mentorship",
+    description: "Get guidance from faculty mentors and industry professionals during the event.",
+    color: "from-purple-500/20 to-purple-600/10",
+    iconColor: "text-purple-400",
+  },
+  {
+    icon: "Globe",
+    title: "National Platform",
+    description: "Top teams earn the chance to represent SXC Ranchi at Smart India Hackathon 2026.",
+    color: "from-green-500/20 to-green-600/10",
+    iconColor: "text-success",
+  },
+  {
+    icon: "Award",
+    title: "Certificates & Awards",
+    description: "All participants receive participation certificates. Winners get merit recognition.",
+    color: "from-yellow-500/20 to-yellow-600/10",
+    iconColor: "text-yellow-400",
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin
+// ─────────────────────────────────────────────────────────────────────────────
+export const ADMIN_SESSION_KEY = "sxc_sih_admin_session";

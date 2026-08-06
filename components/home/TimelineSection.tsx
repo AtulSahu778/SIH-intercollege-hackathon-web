@@ -34,7 +34,7 @@ export default function TimelineSection() {
             <span className="text-white">idea to SIH</span>
           </h2>
           <p className="mt-4 text-white/50 leading-relaxed">
-            Five milestones. One destination — representing St. Xavier's College, Ranchi at the national stage.
+            Five milestones. One destination — representing St. Xavier&apos;s College, Ranchi at the national stage.
           </p>
         </motion.div>
 

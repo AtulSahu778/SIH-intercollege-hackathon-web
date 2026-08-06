@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Check, AlertCircle } from "lucide-react";
+import { Users, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VALIDATION } from "@/lib/constants";
 

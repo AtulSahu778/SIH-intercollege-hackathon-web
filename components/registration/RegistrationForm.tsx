@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
-  ChevronDown, ChevronUp, Loader2, Send,
+  Loader2, Send,
   Users, FolderOpen, Lightbulb, Upload, CheckCircle2, ChevronRight, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import {
   RegistrationSchemaType,
 } from "@/lib/validation/registrationSchema";
 import { submitRegistration, fileToBase64 } from "@/lib/api/appsScript";
-import { VALIDATION } from "@/lib/constants";
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Section config
@@ -104,7 +104,7 @@ export default function RegistrationForm() {
     },
   });
 
-  const { handleSubmit, watch, reset, trigger, formState: { errors } } = methods;
+  const { handleSubmit, watch, reset, trigger, formState: { errors: _errors } } = methods;
 
   // ── Load autosaved draft ──────────────────────────────────────────────────
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function RegistrationForm() {
   const formValues = watch();
   useEffect(() => {
     const timer = setTimeout(() => {
-      const { presentationFile, ...saveable } = formValues;
+      const { presentationFile: _presentationFile, ...saveable } = formValues;
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(saveable));
     }, 800);
     return () => clearTimeout(timer);
@@ -147,7 +147,7 @@ export default function RegistrationForm() {
     else if (currentStep === 2) fieldsToValidate = ["members"];
     else if (currentStep === 3) fieldsToValidate = ["problemStatement", "ideaTitle", "ideaDescription"];
 
-    const isStepValid = await trigger(fieldsToValidate as any);
+    const isStepValid = await trigger(fieldsToValidate as (keyof RegistrationSchemaType)[]);
     if (isStepValid) {
       setCurrentStep((prev) => Math.min(prev + 1, 4));
       window.scrollTo({ top: 0, behavior: 'smooth' });

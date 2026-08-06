@@ -50,6 +50,45 @@ const ELIGIBILITY_ITEMS = [
   },
 ];
 
+type EligibilityItemType = (typeof ELIGIBILITY_ITEMS)[number];
+
+// Extracted into its own component so useRef/useInView are called at the component
+// level — not inside a .map() callback, which violates the Rules of Hooks.
+function EligibilityItem({ item, index }: { item: EligibilityItemType; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-40px" });
+  const Icon = item.icon;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: 20 }}
+      animate={isInView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] as const }}
+      className={`flex items-start gap-4 p-4 rounded-2xl border ${item.bgColor} ${item.borderColor} group hover:shadow-sm transition-shadow duration-200`}
+      role="listitem"
+    >
+      {/* Icon */}
+      <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${item.bgColor} border ${item.borderColor} flex items-center justify-center`}>
+        <Icon className={`w-5 h-5 ${item.color}`} />
+      </div>
+
+      {/* Text */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-text-primary text-sm">{item.title}</h3>
+          <div className="ml-auto flex-shrink-0">
+            <div className="w-5 h-5 rounded-full bg-success/15 border border-success/30 flex items-center justify-center">
+              <Check className="w-3 h-3 text-success" strokeWidth={3} />
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-text-muted mt-1 leading-relaxed">{item.description}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function EligibilitySection() {
   const headerRef = useRef<HTMLDivElement>(null);
   const isHeaderInView = useInView(headerRef, { once: true, margin: "-80px" });
@@ -75,7 +114,7 @@ export default function EligibilitySection() {
               <span className="text-gradient">participate?</span>
             </h2>
             <p className="mt-4 text-text-muted leading-relaxed">
-              The Internal SIH 2026 is open to all students of St. Xavier's College, Ranchi.
+              The Internal SIH 2026 is open to all students of St. Xavier&apos;s College, Ranchi.
               Please read the eligibility rules carefully before registering.
             </p>
 
@@ -96,41 +135,9 @@ export default function EligibilitySection() {
 
           {/* Right — Checklist */}
           <div className="space-y-4">
-            {ELIGIBILITY_ITEMS.map((item, index) => {
-              const Icon = item.icon;
-              const ref = useRef<HTMLDivElement>(null);
-              const isInView = useInView(ref, { once: true, margin: "-40px" });
-
-              return (
-                <motion.div
-                  key={item.title}
-                  ref={ref}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] as const }}
-                  className={`flex items-start gap-4 p-4 rounded-2xl border ${item.bgColor} ${item.borderColor} group hover:shadow-sm transition-shadow duration-200`}
-                  role="listitem"
-                >
-                  {/* Check icon */}
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${item.bgColor} border ${item.borderColor} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${item.color}`} />
-                  </div>
-
-                  {/* Text */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-text-primary text-sm">{item.title}</h3>
-                      <div className="ml-auto flex-shrink-0">
-                        <div className="w-5 h-5 rounded-full bg-success/15 border border-success/30 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-success" strokeWidth={3} />
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-text-muted mt-1 leading-relaxed">{item.description}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {ELIGIBILITY_ITEMS.map((item, index) => (
+              <EligibilityItem key={item.title} item={item} index={index} />
+            ))}
           </div>
         </div>
       </div>

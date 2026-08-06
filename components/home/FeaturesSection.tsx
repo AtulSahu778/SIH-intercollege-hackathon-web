@@ -3,17 +3,17 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { Globe, Award } from "lucide-react";
+import { Globe, Award, Lightbulb, Users, Target, GraduationCap } from "lucide-react";
 import { FEATURES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import processLogo from "@/app/images/hackathon-process-logo.png";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Lightbulb: require("lucide-react").Lightbulb,
-  Users: require("lucide-react").Users,
-  Target: require("lucide-react").Target,
-  GraduationCap: require("lucide-react").GraduationCap,
+  Lightbulb,
+  Users,
+  Target,
+  GraduationCap,
   Globe,
   Award,
 };
@@ -28,7 +28,7 @@ interface FeatureCardProps {
 }
 
 function FeatureCard({ title, description, icon, color, iconColor, index }: FeatureCardProps) {
-  const Icon = ICONS[icon] || require("lucide-react").Lightbulb;
+  const Icon = ICONS[icon] ?? Lightbulb;
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 

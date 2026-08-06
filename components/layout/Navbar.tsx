@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Zap, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { COLLEGE, HACKATHON } from "@/lib/constants";
@@ -21,7 +21,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isHeroSection, setIsHeroSection] = useState(true);
+  const [_isHeroSection, setIsHeroSection] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function Navbar() {
     setIsOpen(false);
   }, [pathname]);
 
-  const isHomePage = pathname === "/";
+  const _isHomePage = pathname === "/";
 
   return (
     <>

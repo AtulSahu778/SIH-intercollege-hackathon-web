@@ -9,7 +9,7 @@ import {
 import { AlertCircle, Users, Layers, BookOpen, Tag } from "lucide-react";
 import { DEPARTMENTS, ACADEMIC_YEARS, CATEGORIES } from "@/lib/constants";
 import { RegistrationSchemaType } from "@/lib/validation/registrationSchema";
-import { cn } from "@/lib/utils";
+
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;

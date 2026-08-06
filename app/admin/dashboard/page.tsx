@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell
 } from "recharts";
 import {
   Users, Clock, CheckCircle2, XCircle, RefreshCw, Download,
-  Search, Filter, Eye, ChevronDown, LogOut, Zap
+  Search, Eye, LogOut, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,6 @@ import { cn } from "@/lib/utils";
 // ─────────────────────────────────────────────────────────────────────────────
 // Colors
 // ─────────────────────────────────────────────────────────────────────────────
-const CHART_COLORS = ["#0B2545", "#123C7A", "#FF7A1A", "#06B6D4", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
 const PIE_COLORS = { Male: "#0B2545", Female: "#FF7A1A", Other: "#06B6D4", "Prefer not to say": "#10B981" };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -276,7 +275,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm overflow-hidden">
           <h2 className="font-bold text-text-primary mb-4 sm:mb-5">Category Distribution</h2>
           <div className="flex overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 md:flex md:flex-wrap gap-3 sm:gap-6 snap-x hide-scrollbar">
-            {categoryData.map((cat, i) => (
+            {categoryData.map((cat) => (
               <div key={cat.name} className="flex-1 min-w-[140px] sm:min-w-0 snap-start text-center p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100">
                 <div className="text-xl sm:text-2xl font-black text-text-primary">{cat.count}</div>
                 <div className="text-[10px] sm:text-xs text-text-muted mt-1 leading-tight">{cat.name}</div>
@@ -291,7 +290,7 @@ export default function AdminDashboard() {
           <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-text-primary">All Registrations</h2>
-              <Badge variant="navy" className="sm:hidden">{filtered.length} Total</Badge>
+              <Badge variant="outline" className="sm:hidden">{filtered.length} Total</Badge>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <div className="relative flex-1">

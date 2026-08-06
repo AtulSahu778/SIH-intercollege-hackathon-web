@@ -27,7 +27,7 @@ export default function Section4Upload() {
   const presentationFile = watch("presentationFile");
 
   const onDrop = useCallback(
-    (acceptedFiles: File[], rejectedFiles: unknown[]) => {
+    (acceptedFiles: File[], _rejectedFiles: unknown[]) => {
       if (acceptedFiles.length > 0) {
         const file = acceptedFiles[0];
         setValue("presentationFile", file, { shouldValidate: true, shouldDirty: true });

@@ -2,9 +2,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, ChevronRight, BookOpen, Zap, Star, Shield, Users } from "lucide-react";
+import { ArrowRight, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { COLLEGE, HACKATHON } from "@/lib/constants";
 import Image from "next/image";
 import pmBanner from "@/app/images/sih2025-slider-banner-PM-Banner2.png";
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Zap, Mail, Phone, MapPin, ExternalLink, Heart } from "lucide-react";
+import { Phone, ExternalLink, Heart } from "lucide-react";
 import { COLLEGE, HACKATHON } from "@/lib/constants";
 import Image from "next/image";
 import sihLogo from "@/app/images/SIH2026-logo.png";

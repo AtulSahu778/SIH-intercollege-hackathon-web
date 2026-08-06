@@ -34,21 +34,8 @@ function WordCounter({ value, max }: { value: string; max: number }) {
   );
 }
 
-const PROBLEM_STATEMENT_DOMAINS = [
-  "Agriculture / Rural Development",
-  "Education & Skill Development",
-  "Health & Wellness",
-  "Environment & Sustainability",
-  "Smart Cities & Infrastructure",
-  "Finance / Fintech",
-  "Disaster Management",
-  "Transportation & Mobility",
-  "Women Safety & Empowerment",
-  "Cybersecurity",
-  "Governance & Digital Services",
-  "Tourism & Culture",
-  "Other",
-];
+
+
 
 export default function Section3ProjectDetails() {
   const {

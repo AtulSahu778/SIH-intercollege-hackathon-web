@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { COLLEGE, HACKATHON, TIMELINE } from "@/lib/constants";
+import { COLLEGE, HACKATHON } from "@/lib/constants";
 
 // Dynamically import jsPDF to avoid SSR issues
 async function downloadPDF(teamId: string, teamName: string, ideaTitle: string) {
@@ -130,7 +130,7 @@ function SuccessContent() {
               </Button>
             </div>
             <p className="text-xs text-text-muted mt-2">
-              Save this ID. You'll need it for all future communications with IQAC.
+              Save this ID. You&apos;ll need it for all future communications with IQAC.
             </p>
           </motion.div>
 

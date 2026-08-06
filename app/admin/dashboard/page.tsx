@@ -3,13 +3,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import sxcLogo from "@/app/images/sxclogo.jpg";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from "recharts";
 import {
   Users, Clock, CheckCircle2, XCircle, RefreshCw, Download,
-  Search, Eye, LogOut, Zap
+  Search, Eye, LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -185,8 +187,8 @@ export default function AdminDashboard() {
       <div className="bg-navy-primary border-b border-white/10 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-accent-orange flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden shadow-sm border border-white/20">
+              <Image src={sxcLogo} alt="College Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="text-white font-bold text-sm">Admin Dashboard</div>

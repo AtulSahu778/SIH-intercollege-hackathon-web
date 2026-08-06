@@ -29,11 +29,11 @@ export default function TimelineSection() {
             <span className="w-1.5 h-1.5 rounded-full bg-white" />
             Event Timeline
           </div>
-          <h2 id="timeline-heading" className="text-3xl sm:text-4xl font-black text-white leading-tight">
+          <h2 id="timeline-heading" className="text-2xl sm:text-4xl font-black text-white leading-tight">
             Your journey from{" "}
             <span className="text-white">idea to SIH</span>
           </h2>
-          <p className="mt-4 text-white/50 leading-relaxed">
+          <p className="mt-3 text-xs sm:text-base text-white/60 leading-relaxed">
             Five milestones. One destination — representing St. Xavier&apos;s College, Ranchi at the national stage.
           </p>
         </motion.div>

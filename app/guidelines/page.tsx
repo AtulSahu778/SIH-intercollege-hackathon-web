@@ -87,8 +87,8 @@ const SECTIONS = [
           },
           {
             step: "2",
-            title: "Internal Hackathon (48 Hours)",
-            desc: "All eligible teams participate in the 48-hour on-campus hackathon. Teams present their working prototypes or demos.",
+            title: "Internal Hackathon (24 Hours)",
+            desc: "All eligible teams participate in the 24-hour on-campus hackathon. Teams present their working prototypes or demos.",
           },
           {
             step: "3",
@@ -207,17 +207,17 @@ export default function GuidelinesPage() {
         <div className="absolute inset-0 grid-pattern opacity-30" />
         <div className="absolute right-0 top-0 w-64 h-64 bg-accent-cyan/5 rounded-full blur-3xl" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-14 sm:pt-36 sm:pb-20">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="w-5 h-5 text-accent-orange" />
               <span className="text-white/60 text-sm font-medium">Hackathon Guidelines</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+            <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight">
               Rules, Eligibility &{" "}
               <span className="text-gradient-cyan">Selection Process</span>
             </h1>
-            <p className="mt-4 text-white/60 leading-relaxed max-w-xl">
+            <p className="mt-3 text-xs sm:text-base text-white/60 leading-relaxed max-w-xl">
               Everything you need to know about participating in the Internal SIH 2026 at{" "}
               <span className="text-white/80 font-semibold">{COLLEGE.name}</span>.
               Read carefully before registering.

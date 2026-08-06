@@ -88,11 +88,11 @@ export default function FeaturesSection() {
             <span className="w-1.5 h-1.5 rounded-full bg-accent-orange" />
             Why Participate
           </div>
-          <h2 id="features-heading" className="text-3xl sm:text-4xl font-black text-text-primary leading-tight">
+          <h2 id="features-heading" className="text-2xl sm:text-4xl font-black text-text-primary leading-tight">
             Everything you need to{" "}
             <span className="text-gradient">innovate & excel</span>
           </h2>
-          <p className="mt-4 text-text-muted leading-relaxed">
+          <p className="mt-3 text-xs sm:text-base text-text-muted leading-relaxed max-w-2xl">
             The Internal SIH provides a complete ecosystem for student innovators — from idea to national-level recognition.
           </p>
         </motion.div>

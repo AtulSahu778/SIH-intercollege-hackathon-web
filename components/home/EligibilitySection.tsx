@@ -109,11 +109,11 @@ export default function EligibilitySection() {
               <span className="w-1.5 h-1.5 rounded-full bg-accent-orange" />
               Eligibility Criteria
             </div>
-            <h2 id="eligibility-heading" className="text-3xl sm:text-4xl font-black text-text-primary leading-tight">
+            <h2 id="eligibility-heading" className="text-2xl sm:text-4xl font-black text-text-primary leading-tight">
               Who can{" "}
               <span className="text-gradient">participate?</span>
             </h2>
-            <p className="mt-4 text-text-muted leading-relaxed">
+            <p className="mt-3 text-xs sm:text-base text-text-muted leading-relaxed">
               The Internal SIH 2026 is open to all students of St. Xavier&apos;s College, Ranchi.
               Please read the eligibility rules carefully before registering.
             </p>

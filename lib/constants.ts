@@ -48,7 +48,7 @@ export const TIMELINE = [
     id: 3,
     phase: "Internal Hackathon",
     date: "Sep 20–21, 2026",
-    description: "48-hour on-campus hackathon. All registered teams participate.",
+    description: "24-hour on-campus hackathon. All registered teams participate.",
     status: "upcoming",
     icon: "Zap",
   },

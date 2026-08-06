@@ -60,20 +60,24 @@ export default function HeroSection() {
             </motion.div>
 
             {/* Top badge */}
-            <motion.div variants={itemVariants} className="flex items-center justify-center mb-6">
-              <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-4 py-2 sm:py-2.5 rounded-full bg-white/10 backdrop-blur-md text-xs sm:text-sm font-medium text-white/90 shadow-lg text-center max-w-full">
-                <span className="font-semibold text-white">St. Xavier&apos;s College, Ranchi</span>
-                <span className="text-white/60 font-normal">presents</span>
-                <span className="font-extrabold text-accent-orange">Internal SIH 2026</span>
-                <span className="text-white/60 font-normal">in association with</span>
-                <span className="font-semibold text-amber-300 bg-white/10 px-2 py-0.5 rounded-md">IQAC</span>
+            <motion.div variants={itemVariants} className="flex items-center justify-center mb-5 sm:mb-6 px-2">
+              <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 py-1 text-[11px] sm:text-sm font-medium text-white/90 text-center max-w-full">
+                <span className="font-bold text-white tracking-tight">St. Xavier&apos;s College, Ranchi</span>
+                <span className="text-white/60 font-normal text-[10px] sm:text-xs uppercase tracking-wider px-0.5">presents</span>
+                <span className="font-black bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent drop-shadow-sm">
+                  Internal SIH 2026
+                </span>
+                <span className="text-white/60 font-normal text-[10px] sm:text-xs uppercase tracking-wider px-0.5">in association with</span>
+                <span className="inline-flex items-center gap-1 font-semibold text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-full text-[11px] sm:text-xs">
+                  IQAC
+                </span>
               </div>
             </motion.div>
 
             {/* Main headline */}
             <motion.h1
               variants={itemVariants}
-              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.15] sm:leading-[1.05] tracking-tight"
+              className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.12] sm:leading-[1.05] tracking-tight"
             >
               Internal{" "}
               <span className="text-gradient block">Smart India</span>
@@ -83,7 +87,7 @@ export default function HeroSection() {
             {/* Subtitle */}
             <motion.p
               variants={itemVariants}
-              className="mt-6 text-base sm:text-lg text-white/60 leading-relaxed max-w-xl mx-auto"
+              className="mt-4 sm:mt-6 text-sm sm:text-lg text-white/70 leading-relaxed max-w-xl mx-auto px-2"
             >
               Showcase your innovation. Represent your college.{" "}
               <br className="hidden sm:block" />
@@ -97,7 +101,7 @@ export default function HeroSection() {
               className="flex items-center justify-center gap-6 mt-8"
             >
               {[
-                { value: "48", label: "Hour Hackathon" },
+                { value: "24", label: "Hour Hackathon" },
                 { value: "6", label: "Members/Team" },
                 { value: "SIH", label: "Nomination Awaits" },
               ].map((stat) => (
@@ -111,18 +115,27 @@ export default function HeroSection() {
             {/* CTAs */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-10 w-full sm:w-auto"
             >
-              <Button asChild size="xl" className="w-full sm:w-auto group shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50">
-                <Link href="/register">
-                  Register Your Team
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              <Button
+                asChild
+                size="xl"
+                className="w-full sm:w-auto bg-gradient-to-r from-accent-orange via-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-98 transition-all duration-300 group border border-orange-400/30"
+              >
+                <Link href="/register" className="flex items-center justify-center gap-2">
+                  <span>Register Your Team</span>
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1.5" />
                 </Link>
               </Button>
-              <Button asChild variant="glass" size="xl" className="w-full sm:w-auto">
-                <Link href="/guidelines">
-                  <BookOpen className="w-5 h-5" />
-                  View Guidelines
+
+              <Button
+                asChild
+                size="xl"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 backdrop-blur-xl text-white font-semibold rounded-2xl shadow-lg shadow-navy-primary/40 hover:shadow-cyan-500/10 active:scale-98 transition-all duration-300 group"
+              >
+                <Link href="/guidelines" className="flex items-center justify-center gap-2.5">
+                  <BookOpen className="w-5 h-5 text-accent-cyan transition-transform group-hover:scale-110" />
+                  <span>View Guidelines</span>
                 </Link>
               </Button>
             </motion.div>

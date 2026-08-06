@@ -10,7 +10,9 @@ import { COLLEGE, HACKATHON } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
-import collegeLogo from "@/app/images/SIH-Logo.png";
+import sihLogo from "@/app/images/SIH-Logo.png";
+import sxcLogo from "@/app/images/sxclogo.jpg";
+
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/guidelines", label: "Guidelines" },
@@ -38,7 +40,10 @@ export default function Navbar() {
     setIsOpen(false);
   }, [pathname]);
 
-
+  // Don't render navbar in admin dashboard
+  if (pathname.startsWith("/admin/dashboard")) {
+    return null;
+  }
 
   return (
     <>
@@ -56,22 +61,18 @@ export default function Navbar() {
           <div className="px-5 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group" aria-label="Go to homepage">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <Image src={collegeLogo} alt="College Logo" className="h-11 sm:h-12 w-auto max-w-[140px] object-contain drop-shadow-sm" />
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group" aria-label="Go to homepage">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <Image src={sxcLogo} alt="SXC Crest Logo" className="h-10 sm:h-12 w-auto object-contain drop-shadow-sm" />
+                <div className="h-7 sm:h-8 w-[1px] bg-slate-200" />
+                <Image src={sihLogo} alt="SIH Logo" className="h-10 sm:h-12 w-auto max-w-[130px] sm:max-w-[150px] object-contain drop-shadow-sm" />
               </div>
-              <div className="hidden sm:block">
+              <div className="hidden lg:block border-l border-slate-200 pl-3">
                 <div className="text-sm font-bold leading-none text-navy-primary transition-colors duration-200">
                   {HACKATHON.shortName}
                 </div>
                 <div className="text-xs mt-0.5 text-text-muted transition-colors duration-200">
                   {COLLEGE.shortName}
-                </div>
-              </div>
-              {/* Mobile logo text */}
-              <div className="sm:hidden">
-                <div className="text-sm font-bold text-navy-primary transition-colors duration-200">
-                  iSIH 2026
                 </div>
               </div>
             </Link>
@@ -122,7 +123,12 @@ export default function Navbar() {
 
             {/* Mobile Hamburger */}
             <button
-              className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200 text-navy-primary hover:bg-slate-50"
+              className={cn(
+                "md:hidden flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 active:scale-95 focus:outline-none",
+                isOpen
+                  ? "bg-accent-orange text-white shadow-lg shadow-orange-500/30"
+                  : "bg-slate-100/90 hover:bg-slate-200/80 text-navy-primary border border-slate-200/70"
+              )}
               onClick={() => setIsOpen(!isOpen)}
               aria-expanded={isOpen}
               aria-controls="mobile-menu"
@@ -132,22 +138,22 @@ export default function Navbar() {
                 {isOpen ? (
                   <motion.div
                     key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+                    initial={{ rotate: -90, scale: 0.75, opacity: 0 }}
+                    animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                    exit={{ rotate: 90, scale: 0.75, opacity: 0 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-5 h-5 stroke-[2.5]" />
                   </motion.div>
                 ) : (
                   <motion.div
                     key="open"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+                    initial={{ rotate: 90, scale: 0.75, opacity: 0 }}
+                    animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                    exit={{ rotate: -90, scale: 0.75, opacity: 0 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
                   >
-                    <Menu className="w-5 h-5" />
+                    <Menu className="w-5 h-5 stroke-[2.5]" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -156,6 +162,7 @@ export default function Navbar() {
         </div>
       </header>
     </div>
+
       {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
@@ -166,49 +173,50 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-navy-primary/50 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-navy-primary/40 backdrop-blur-md md:hidden"
               onClick={() => setIsOpen(false)}
             />
             {/* Drawer */}
             <motion.div
               ref={menuRef}
               id="mobile-menu"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed top-16 left-4 right-4 z-50 bg-white rounded-2xl shadow-2xl overflow-hidden md:hidden"
+              initial={{ opacity: 0, y: -16, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -16, scale: 0.96 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed top-20 left-4 right-4 z-50 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden md:hidden"
             >
-              <nav className="p-4 space-y-1" aria-label="Mobile navigation">
+              <nav className="p-4 space-y-1.5" aria-label="Mobile navigation">
                 {NAV_LINKS.map((link, index) => (
                   <motion.div
                     key={link.href}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
                     <Link
                       href={link.href}
                       className={cn(
-                        "flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 touch-target",
+                        "flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 touch-target",
                         link.highlight
-                          ? "bg-accent-orange text-white shadow-md"
+                          ? "bg-accent-orange text-white shadow-lg shadow-orange-500/25 active:bg-orange-600"
                           : pathname === link.href
-                            ? "bg-orange-50 text-accent-orange"
-                            : "text-text-primary hover:bg-slate-50"
+                            ? "bg-orange-50/80 text-accent-orange font-bold"
+                            : "text-text-primary hover:bg-slate-100/70"
                       )}
                     >
-                      {link.label}
-                      {link.highlight && <ChevronRight className="w-4 h-4" />}
+                      <span>{link.label}</span>
+                      <ChevronRight className={cn("w-4 h-4 opacity-70", link.highlight && "opacity-100")} />
                     </Link>
                   </motion.div>
                 ))}
-                <div className="pt-2 border-t border-slate-100 mt-2">
+                <div className="pt-2.5 border-t border-slate-100 mt-2.5">
                   <Link
                     href="/admin"
-                    className="flex items-center px-4 py-3 rounded-xl text-sm text-text-muted hover:bg-slate-50 transition-colors duration-200"
+                    className="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-text-muted hover:text-navy-primary hover:bg-slate-100/70 transition-all duration-200"
                   >
-                    Admin Dashboard
+                    <span>Admin Dashboard</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">Portal</span>
                   </Link>
                 </div>
               </nav>
@@ -216,9 +224,6 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
-
-      {/* Spacer for fixed navbar on non-hero pages */}
-      {pathname !== "/" && <div className="h-16 lg:h-18" />}
     </>
   );
 }

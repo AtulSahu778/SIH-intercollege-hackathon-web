@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Zap, Eye, EyeOff, Lock, AlertCircle, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Lock, AlertCircle, Loader2 } from "lucide-react";
+import Image from "next/image";
+import sxcLogo from "@/app/images/sxclogo.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { COLLEGE, HACKATHON, ADMIN_SESSION_KEY } from "@/lib/constants";
@@ -54,8 +56,8 @@ export default function AdminLoginPage() {
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-br from-navy-primary to-navy-secondary px-8 py-8 text-center">
-            <div className="flex items-center justify-center w-14 h-14 mx-auto mb-4 rounded-2xl bg-accent-orange shadow-lg">
-              <Zap className="w-7 h-7 text-white" strokeWidth={2.5} />
+            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-white p-1.5 shadow-lg border border-white/20 overflow-hidden">
+              <Image src={sxcLogo} alt="College Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-xl font-black text-white mb-1">Admin Access</h1>
             <p className="text-white/60 text-xs">{HACKATHON.name}</p>

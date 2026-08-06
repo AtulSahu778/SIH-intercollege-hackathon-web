@@ -20,8 +20,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIGURATION — Update these before deploying
 // ─────────────────────────────────────────────────────────────────────────────
-const SPREADSHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
-const DRIVE_FOLDER_ID = "YOUR_GOOGLE_DRIVE_FOLDER_ID"; // ← Replace this!
+const DRIVE_FOLDER_ID = "1myhKtKh60lSuvsRSBuy7wkl6NJB1_0xm"; // ← Clean Folder ID
 
 const SHEET_NAMES = {
   REGISTRATIONS: "Registrations",
@@ -78,6 +77,8 @@ function doPost(e) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REGISTER TEAM
+// PDF upload is queued asynchronously via a time-based trigger so that
+// this function returns immediately without blocking on Drive I/O.
 // ─────────────────────────────────────────────────────────────────────────────
 function registerTeam(data) {
   // ── Validate ──────────────────────────────────────────────────────────────
@@ -99,7 +100,7 @@ function registerTeam(data) {
     return { success: false, error: "All member emails must be unique" };
   }
 
-  // ── Check for duplicate team registration (same team name or leader email)
+  // ── Check for duplicate team registration (same team name or leader email) ─
   const regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
   const existingData = regSheet.getDataRange().getValues();
   const leaderEmail = data.members[0]?.email?.toLowerCase();
@@ -122,21 +123,14 @@ function registerTeam(data) {
   // ── Generate Team ID ───────────────────────────────────────────────────────
   const teamId = generateTeamId();
 
-  // ── Upload PDF to Drive ────────────────────────────────────────────────────
-  let pdfUrl = "";
-  if (data.pdfBase64 && data.pdfFileName) {
-    try {
-      pdfUrl = uploadPDF(data.pdfBase64, data.pdfFileName, teamId);
-    } catch (err) {
-      return { success: false, error: "PDF upload failed: " + String(err) };
-    }
-  } else {
+  // ── Validate PDF payload exists (upload happens asynchronously) ────────────
+  if (!data.pdfBase64 || !data.pdfFileName) {
     return { success: false, error: "Idea presentation PDF is required" };
   }
 
   const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
-  // ── Save to Registrations sheet ───────────────────────────────────────────
+  // ── Save to Registrations sheet immediately ────────────────────────────────
   regSheet.appendRow([
     timestamp,                   // A: Timestamp
     teamId,                      // B: Team ID
@@ -150,7 +144,7 @@ function registerTeam(data) {
     "Pending",                   // J: Status
   ]);
 
-  // ── Save Team Members ─────────────────────────────────────────────────────
+  // ── Save Team Members immediately ─────────────────────────────────────────
   data.members.forEach((member) => {
     membersSheet.appendRow([
       teamId,                    // A: Team ID
@@ -162,20 +156,89 @@ function registerTeam(data) {
     ]);
   });
 
-  // ── Save Upload record ────────────────────────────────────────────────────
-  const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
-  uploadsSheet.appendRow([
-    teamId,                      // A: Team ID
-    pdfUrl,                      // B: PDF URL
-    timestamp,                   // C: Submission Time
-  ]);
+  // ── Queue PDF upload via PropertiesService + time-based trigger ───────────
+  // Store the PDF payload in script properties so the async trigger can read it.
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const pendingKey = "pdf_pending_" + teamId;
+    props.setProperty(pendingKey, JSON.stringify({
+      teamId: teamId,
+      pdfBase64: data.pdfBase64,
+      pdfFileName: data.pdfFileName,
+      timestamp: timestamp,
+    }));
 
+    // Create a one-time trigger to fire in 1 minute
+    ScriptApp.newTrigger("processPendingPdfUploads")
+      .timeBased()
+      .after(60 * 1000) // 1 minute from now
+      .create();
+  } catch (triggerErr) {
+    // Trigger creation failed — attempt synchronous fallback upload
+    console.warn("Async trigger failed, attempting sync upload:", triggerErr);
+    try {
+      const pdfUrl = uploadPDF(data.pdfBase64, data.pdfFileName, teamId);
+      const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+      uploadsSheet.appendRow([teamId, pdfUrl, timestamp]);
+    } catch (uploadErr) {
+      // Log but don't fail — data is already saved
+      console.error("Sync PDF upload also failed:", uploadErr);
+    }
+  }
+
+  // ── Respond immediately ───────────────────────────────────────────────────
   return {
     success: true,
     teamId: teamId,
-    message: "Registration successful!",
-    pdfUrl: pdfUrl,
+    message: "Registration successful! Your presentation PDF is being processed and will be available shortly.",
+    pdfUrl: "",  // Will be filled once the async trigger runs
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ASYNC PDF UPLOAD PROCESSOR
+// Called by the time-based trigger created in registerTeam().
+// Reads all pending PDF jobs from PropertiesService, uploads them to Drive,
+// and records the URL in the Uploads sheet.
+// ─────────────────────────────────────────────────────────────────────────────
+function processPendingPdfUploads() {
+  const props = PropertiesService.getScriptProperties();
+  const allProps = props.getProperties();
+  const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+
+  let processed = 0;
+
+  for (const key in allProps) {
+    if (!key.startsWith("pdf_pending_")) continue;
+
+    try {
+      const job = JSON.parse(allProps[key]);
+      const pdfUrl = uploadPDF(job.pdfBase64, job.pdfFileName, job.teamId);
+
+      uploadsSheet.appendRow([
+        job.teamId,    // A: Team ID
+        pdfUrl,        // B: PDF URL
+        job.timestamp, // C: Submission Time
+      ]);
+
+      props.deleteProperty(key);
+      processed++;
+      console.log("PDF uploaded for team:", job.teamId, "->", pdfUrl);
+    } catch (err) {
+      console.error("Failed to upload PDF for key:", key, String(err));
+      // Leave the property so it can be retried on the next trigger run
+    }
+  }
+
+  // Clean up completed triggers
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const trigger of triggers) {
+    if (trigger.getHandlerFunction() === "processPendingPdfUploads") {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  }
+
+  console.log("processPendingPdfUploads: processed", processed, "job(s)");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -269,7 +332,11 @@ function updateStatus(teamId, status) {
 // UPLOAD PDF TO DRIVE
 // ─────────────────────────────────────────────────────────────────────────────
 function uploadPDF(base64Data, fileName, teamId) {
-  const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+  let folderId = DRIVE_FOLDER_ID;
+  if (folderId.includes("/folders/")) {
+    folderId = folderId.split("/folders/")[1].split("?")[0].split("/")[0];
+  }
+  const folder = DriveApp.getFolderById(folderId);
 
   // Decode base64
   const decoded = Utilities.base64Decode(base64Data);

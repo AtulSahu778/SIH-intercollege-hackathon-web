@@ -1,16 +1,17 @@
 "use client";
 
 import { useFormContext, Controller } from "react-hook-form";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
-import { AlertCircle, Crown, User } from "lucide-react";
+import { AlertCircle, Crown, User, ChevronDown } from "lucide-react";
 import { RegistrationSchemaType } from "@/lib/validation/registrationSchema";
 import FemaleBadge from "./FemaleBadge";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other", "Prefer not to say"] as const;
 
@@ -27,9 +28,11 @@ function FieldError({ message }: { message?: string }) {
 interface MemberRowProps {
   index: number;
   isLeader: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-function MemberRow({ index, isLeader }: MemberRowProps) {
+function MemberRow({ index, isLeader, isOpen, onToggle }: MemberRowProps) {
   const {
     register,
     control,
@@ -38,48 +41,62 @@ function MemberRow({ index, isLeader }: MemberRowProps) {
   } = useFormContext<RegistrationSchemaType>();
 
   const memberErrors = errors.members?.[index];
+  const name = watch(`members.${index}.fullName`);
+  const gender = watch(`members.${index}.gender`);
+  const hasError = !!memberErrors;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.35 }}
+    <div
       className={cn(
-        "rounded-2xl border p-4 sm:p-5",
-        isLeader
-          ? "bg-gradient-to-br from-orange-50 to-orange-50/30 border-orange-200"
-          : "bg-white border-slate-100"
+        "rounded-2xl border overflow-hidden transition-all duration-200 shadow-sm",
+        isLeader ? "border-navy-primary/30" : "border-slate-200",
+        hasError && !isOpen ? "border-red-300" : ""
       )}
     >
-      {/* Member header */}
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className={cn(
-          "w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0",
-          isLeader ? "bg-accent-orange" : "bg-navy-primary/10"
-        )}>
-          {isLeader ? (
-            <Crown className="w-4 h-4 text-white" />
-          ) : (
-            <User className="w-4 h-4 text-navy-primary" />
-          )}
-        </div>
-        <div>
-          <div className="font-semibold text-sm text-text-primary">
-            {isLeader ? "Team Leader" : `Member ${index}`}
+      {/* Header Button */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className={cn(
+          "w-full flex items-center justify-between p-4 sm:p-5 text-left transition-colors duration-200",
+          isLeader ? "bg-navy-primary/5 hover:bg-navy-primary/10" : "bg-white hover:bg-slate-50",
+          isOpen ? (isLeader ? "bg-navy-primary/5" : "bg-slate-50") : ""
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm",
+            isLeader ? "bg-navy-primary text-white" : "bg-navy-primary/10 text-navy-primary"
+          )}>
+            {isLeader ? <Crown className="w-5 h-5" /> : <User className="w-5 h-5" />}
           </div>
-          {isLeader && (
-            <div className="text-xs text-accent-orange font-medium">
-              Registrant — fills this form
+          <div>
+            <div className="font-bold text-navy-primary text-sm sm:text-base">
+              {name || (isLeader ? "Team Leader" : `Member ${index + 1}`)}
             </div>
-          )}
+            <div className="text-xs text-text-muted mt-0.5">
+              {isLeader ? "Registrant — fills this form" : `Role: Member`} {gender && `• ${gender}`}
+            </div>
+          </div>
         </div>
-        <div className="ml-auto text-xs text-text-muted font-medium">
-          #{index + 1}
+        <div className="flex items-center gap-3">
+          {hasError && <AlertCircle className="w-5 h-5 text-error" />}
+          <ChevronDown className={cn("w-5 h-5 text-text-muted transition-transform duration-300", isOpen && "rotate-180")} />
         </div>
-      </div>
+      </button>
 
-      {/* Fields — responsive grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Accordion Content */}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden bg-white"
+          >
+            <div className="p-4 sm:p-5 border-t border-slate-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Full Name */}
         <div className="sm:col-span-2 lg:col-span-1">
           <Label htmlFor={`member-${index}-name`} className="text-xs mb-1 block">
@@ -155,8 +172,12 @@ function MemberRow({ index, isLeader }: MemberRowProps) {
           />
           <FieldError message={memberErrors?.mobile?.message} />
         </div>
-      </div>
-    </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -170,15 +191,25 @@ export default function Section2TeamDetails() {
   // Top-level members array error (e.g., duplicate email/mobile, min female)
   const membersError = errors.members?.root?.message || errors.members?.message;
 
+  const [openIndex, setOpenIndex] = useState(0);
+
   return (
     <div className="space-y-4">
       {/* Female Badge — live counter */}
       <FemaleBadge count={femaleCount} />
 
       {/* Members */}
-      {Array.from({ length: 6 }).map((_, index) => (
-        <MemberRow key={index} index={index} isLeader={index === 0} />
-      ))}
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <MemberRow 
+            key={index} 
+            index={index} 
+            isLeader={index === 0} 
+            isOpen={openIndex === index}
+            onToggle={() => setOpenIndex(openIndex === index ? -1 : index)}
+          />
+        ))}
+      </div>
 
       {/* Array-level error */}
       {membersError && (

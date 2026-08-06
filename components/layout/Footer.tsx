@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Zap, Mail, Phone, MapPin, ExternalLink, Heart } from "lucide-react";
 import { COLLEGE, HACKATHON } from "@/lib/constants";
+import Image from "next/image";
+import sihLogo from "@/app/images/SIH2026-logo.png";
 
 const FOOTER_LINKS = [
   { label: "Home", href: "/" },
@@ -27,8 +29,8 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-orange shadow-lg">
-                <Zap className="w-5 h-5 text-white" strokeWidth={2.5} />
+              <div className="flex items-center gap-3 bg-white/5 px-4 py-2.5 rounded-2xl backdrop-blur-sm border border-white/10 flex-wrap">
+                <Image src={sihLogo} alt="SIH 2026" className="h-14 w-auto max-w-[200px] object-contain" />
               </div>
               <div>
                 <div className="font-bold text-base text-white">{HACKATHON.name}</div>
@@ -42,11 +44,13 @@ export default function Footer() {
               <span className="text-white/80 font-medium">{COLLEGE.iqac}</span>.
               Top teams will be shortlisted to represent SXC at the national SIH 2026.
             </p>
-            <div className="mt-5 flex items-center gap-2">
+            <div className="mt-5 flex flex-wrap items-center gap-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/8 border border-white/10 text-xs text-white/60">
                 <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
                 Registrations Open
               </span>
+
+
             </div>
           </div>
 
@@ -90,25 +94,12 @@ export default function Footer() {
             <ul className="space-y-3.5">
               <li>
                 <a
-                  href={`mailto:${COLLEGE.email}`}
-                  className="flex items-start gap-3 text-sm text-white/50 hover:text-white/80 transition-colors duration-200"
-                >
-                  <Mail className="w-4 h-4 mt-0.5 text-accent-orange flex-shrink-0" />
-                  <span>{COLLEGE.email}</span>
-                </a>
-              </li>
-              <li>
-                <a
                   href={`tel:${COLLEGE.phone}`}
                   className="flex items-center gap-3 text-sm text-white/50 hover:text-white/80 transition-colors duration-200"
                 >
                   <Phone className="w-4 h-4 text-accent-cyan flex-shrink-0" />
                   <span>{COLLEGE.phone}</span>
                 </a>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-white/50">
-                <MapPin className="w-4 h-4 mt-0.5 text-white/30 flex-shrink-0" />
-                <span className="leading-relaxed">{COLLEGE.address}</span>
               </li>
             </ul>
           </div>
@@ -120,11 +111,11 @@ export default function Footer() {
             © {currentYear} {COLLEGE.name}. All rights reserved.
           </p>
           <p className="flex items-center gap-1">
-            Designed & Developed with <Heart className="w-3 h-3 text-accent-orange fill-accent-orange" /> by{" "}
-            <span className="text-white/50 font-medium">SXC Innovation Cell</span>
+            Designed & Developed with <Heart className="w-2 h-2 text-accent-orange fill-accent-orange" /> by{" "}
+            <span className="text-white/50 font-medium">Atul Sahu</span>
           </p>
         </div>
       </div>
     </footer>
-  );
+  );  
 }

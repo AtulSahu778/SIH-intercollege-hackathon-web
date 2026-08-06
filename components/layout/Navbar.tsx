@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { COLLEGE, HACKATHON } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
+import collegeLogo from "@/app/images/SIH-Logo.png";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/guidelines", label: "Guidelines" },
@@ -40,47 +42,35 @@ export default function Navbar() {
 
   return (
     <>
-      <header
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled
-            ? "bg-white/95 backdrop-blur-xl border-b border-slate-100 shadow-sm"
-            : isHomePage
-            ? "bg-transparent"
-            : "bg-navy-primary/95 backdrop-blur-xl border-b border-white/10"
-        )}
-        style={{ paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-18">
+      <div className={cn(
+        "fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 pointer-events-none",
+        scrolled ? "top-4 px-4 sm:px-6" : "top-4 px-4 sm:px-6"
+      )}>
+        <header
+          className={cn(
+            "w-full max-w-7xl rounded-full transition-all duration-500 pointer-events-auto border bg-white/95 backdrop-blur-xl border-slate-200/60",
+            scrolled ? "shadow-xl shadow-slate-200/50" : "shadow-lg shadow-slate-200/30"
+          )}
+          style={{ paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}
+        >
+          <div className="px-5 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group" aria-label="Go to homepage">
-              <div className={cn(
-                "flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200",
-                "bg-accent-orange group-hover:bg-orange-500 shadow-md group-hover:shadow-lg"
-              )}>
-                <Zap className="w-5 h-5 text-white" strokeWidth={2.5} />
+              <div className="flex items-center gap-3 sm:gap-4">
+                <Image src={collegeLogo} alt="College Logo" className="h-11 sm:h-12 w-auto max-w-[140px] object-contain drop-shadow-sm" />
               </div>
               <div className="hidden sm:block">
-                <div className={cn(
-                  "text-sm font-bold leading-none transition-colors duration-200",
-                  scrolled ? "text-navy-primary" : "text-white"
-                )}>
+                <div className="text-sm font-bold leading-none text-navy-primary transition-colors duration-200">
                   {HACKATHON.shortName}
                 </div>
-                <div className={cn(
-                  "text-xs mt-0.5 transition-colors duration-200",
-                  scrolled ? "text-text-muted" : "text-white/60"
-                )}>
+                <div className="text-xs mt-0.5 text-text-muted transition-colors duration-200">
                   {COLLEGE.shortName}
                 </div>
               </div>
               {/* Mobile logo text */}
               <div className="sm:hidden">
-                <div className={cn(
-                  "text-sm font-bold transition-colors duration-200",
-                  scrolled ? "text-navy-primary" : "text-white"
-                )}>
+                <div className="text-sm font-bold text-navy-primary transition-colors duration-200">
                   iSIH 2026
                 </div>
               </div>
@@ -104,14 +94,10 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
                       pathname === link.href
-                        ? scrolled
-                          ? "text-accent-orange bg-orange-50"
-                          : "text-accent-orange bg-white/10"
-                        : scrolled
-                        ? "text-text-primary hover:text-accent-orange hover:bg-slate-50"
-                        : "text-white/80 hover:text-white hover:bg-white/10"
+                        ? "text-accent-orange bg-orange-50"
+                        : "text-text-primary hover:text-accent-orange hover:bg-slate-50"
                     )}
                     aria-current={pathname === link.href ? "page" : undefined}
                   >
@@ -124,14 +110,10 @@ export default function Navbar() {
               <Link
                 href="/admin"
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                  pathname.startsWith("/admin")
-                    ? scrolled
-                      ? "text-accent-orange bg-orange-50"
-                      : "text-accent-orange bg-white/10"
-                    : scrolled
-                    ? "text-text-muted hover:text-text-primary hover:bg-slate-50"
-                    : "text-white/50 hover:text-white/80 hover:bg-white/10"
+                  "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
+                  pathname === "/admin"
+                    ? "text-accent-orange bg-orange-50"
+                    : "text-text-muted hover:text-text-primary hover:bg-slate-50"
                 )}
               >
                 Admin
@@ -140,10 +122,7 @@ export default function Navbar() {
 
             {/* Mobile Hamburger */}
             <button
-              className={cn(
-                "md:hidden flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200",
-                scrolled ? "text-navy-primary hover:bg-slate-50" : "text-white hover:bg-white/10"
-              )}
+              className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200 text-navy-primary hover:bg-slate-50"
               onClick={() => setIsOpen(!isOpen)}
               aria-expanded={isOpen}
               aria-controls="mobile-menu"
@@ -176,7 +155,7 @@ export default function Navbar() {
           </div>
         </div>
       </header>
-
+    </div>
       {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
@@ -215,8 +194,8 @@ export default function Navbar() {
                         link.highlight
                           ? "bg-accent-orange text-white shadow-md"
                           : pathname === link.href
-                          ? "bg-orange-50 text-accent-orange"
-                          : "text-text-primary hover:bg-slate-50"
+                            ? "bg-orange-50 text-accent-orange"
+                            : "text-text-primary hover:bg-slate-50"
                       )}
                     >
                       {link.label}

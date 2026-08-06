@@ -13,12 +13,12 @@ export default function RegisterPage() {
       {/* Page Header */}
       <div className="bg-navy-primary relative overflow-hidden">
         <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="absolute right-0 top-0 w-64 h-64 bg-accent-orange/5 rounded-full blur-3xl" />
+        <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white/70 mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white/80 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
               Registrations Open · {HACKATHON.year}
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">

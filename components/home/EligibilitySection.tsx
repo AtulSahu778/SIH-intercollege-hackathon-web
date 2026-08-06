@@ -55,7 +55,7 @@ export default function EligibilitySection() {
   const isHeaderInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-20 lg:py-28 bg-white" aria-labelledby="eligibility-heading">
+    <section className="py-16 lg:py-28 bg-white" aria-labelledby="eligibility-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 

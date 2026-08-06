@@ -8,10 +8,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
   ChevronDown, ChevronUp, Loader2, Send,
-  Users, FolderOpen, Lightbulb, Upload, CheckCircle2
+  Users, FolderOpen, Lightbulb, Upload, CheckCircle2, ChevronRight, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 import RegistrationNotice from "@/components/registration/RegistrationNotice";
@@ -36,32 +35,32 @@ const SECTIONS = [
     title: "Team Information",
     description: "Basic details about your team",
     icon: FolderOpen,
-    color: "text-blue-500",
-    bgColor: "bg-blue-50",
+    color: "text-navy-primary",
+    bgColor: "bg-navy-primary/10",
   },
   {
     id: 2,
     title: "Team Details",
     description: "Leader + 5 member information",
     icon: Users,
-    color: "text-violet-500",
-    bgColor: "bg-violet-50",
+    color: "text-navy-primary",
+    bgColor: "bg-navy-primary/10",
   },
   {
     id: 3,
     title: "Project Details",
     description: "Idea title and description",
     icon: Lightbulb,
-    color: "text-amber-500",
-    bgColor: "bg-amber-50",
+    color: "text-navy-primary",
+    bgColor: "bg-navy-primary/10",
   },
   {
     id: 4,
     title: "Upload Presentation",
     description: "Idea presentation PDF (max 10 MB)",
     icon: Upload,
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-50",
+    color: "text-navy-primary",
+    bgColor: "bg-navy-primary/10",
   },
 ];
 
@@ -86,12 +85,12 @@ const AUTOSAVE_KEY = "sxc_sih_registration_draft";
 // ─────────────────────────────────────────────────────────────────────────────
 export default function RegistrationForm() {
   const router = useRouter();
-  const [openSections, setOpenSections] = useState<number[]>([1]);
+  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<RegistrationSchemaType>({
     resolver: zodResolver(registrationSchema),
-    mode: "onChange",
+    mode: "onTouched",
     defaultValues: {
       teamName: "",
       department: "",
@@ -105,7 +104,7 @@ export default function RegistrationForm() {
     },
   });
 
-  const { handleSubmit, watch, reset, formState: { errors } } = methods;
+  const { handleSubmit, watch, reset, trigger, formState: { errors } } = methods;
 
   // ── Load autosaved draft ──────────────────────────────────────────────────
   useEffect(() => {
@@ -141,28 +140,24 @@ export default function RegistrationForm() {
     return () => clearTimeout(timer);
   }, [formValues]);
 
-  // ── Section toggle ────────────────────────────────────────────────────────
-  const toggleSection = (id: number) => {
-    setOpenSections((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
+  // ── Step Navigation ────────────────────────────────────────────────────────
+  const nextStep = async () => {
+    let fieldsToValidate: string[] = [];
+    if (currentStep === 1) fieldsToValidate = ["teamName", "department", "academicYear", "category"];
+    else if (currentStep === 2) fieldsToValidate = ["members"];
+    else if (currentStep === 3) fieldsToValidate = ["problemStatement", "ideaTitle", "ideaDescription"];
+
+    const isStepValid = await trigger(fieldsToValidate as any);
+    if (isStepValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, 4));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
-  // ── Progress calculation ──────────────────────────────────────────────────
-  const calculateProgress = useCallback(() => {
-    const vals = formValues;
-    let filled = 0;
-    if (vals.teamName && vals.department && vals.academicYear && vals.category) filled += 25;
-    const membersComplete = vals.members?.every(
-      (m) => m.fullName && m.email && m.mobile
-    );
-    if (membersComplete) filled += 25;
-    if (vals.problemStatement && vals.ideaTitle && vals.ideaDescription) filled += 25;
-    if (vals.presentationFile) filled += 25;
-    return filled;
-  }, [formValues]);
-
-  const progress = calculateProgress();
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const onSubmit = async (data: RegistrationSchemaType) => {
@@ -172,6 +167,9 @@ export default function RegistrationForm() {
     }
 
     setIsSubmitting(true);
+    const toastId = toast.loading("Submitting registration...", {
+      description: "Uploading presentation and saving team details. Please wait...",
+    });
 
     try {
       // Convert file to base64
@@ -193,16 +191,19 @@ export default function RegistrationForm() {
       const result = await submitRegistration(payload);
 
       if (result.success && result.teamId) {
+        toast.dismiss(toastId);
         // Clear draft
         localStorage.removeItem(AUTOSAVE_KEY);
         // Navigate to success page
         router.push(`/register/success?teamId=${result.teamId}&teamName=${encodeURIComponent(data.teamName)}&ideaTitle=${encodeURIComponent(data.ideaTitle)}`);
       } else {
+        toast.dismiss(toastId);
         toast.error("Submission failed", {
           description: result.error || "Please try again. If the problem persists, contact IQAC.",
         });
       }
     } catch (error) {
+      toast.dismiss(toastId);
       console.error("Submit error:", error);
       toast.error("Something went wrong", {
         description: "An unexpected error occurred. Please try again.",
@@ -213,18 +214,6 @@ export default function RegistrationForm() {
   };
 
   const onError = () => {
-    // Open all sections with errors
-    const sectionsWithErrors: number[] = [];
-    if (errors.teamName || errors.department || errors.academicYear || errors.category) {
-      sectionsWithErrors.push(1);
-    }
-    if (errors.members) sectionsWithErrors.push(2);
-    if (errors.problemStatement || errors.ideaTitle || errors.ideaDescription) {
-      sectionsWithErrors.push(3);
-    }
-    if (errors.presentationFile) sectionsWithErrors.push(4);
-
-    setOpenSections((prev) => [...new Set([...prev, ...sectionsWithErrors])]);
     toast.error("Please fix the errors before submitting.", {
       description: "Scroll up to see all validation errors.",
     });
@@ -233,175 +222,131 @@ export default function RegistrationForm() {
   return (
     <FormProvider {...methods}>
       <div className="max-w-3xl mx-auto">
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-text-primary">Registration Progress</span>
-            <span className="text-sm font-bold text-accent-orange">{progress}%</span>
-          </div>
-          <Progress value={progress} />
-          <p className="text-xs text-text-muted mt-1.5">
-            {progress < 100
-              ? "Complete all sections to enable submission"
-              : "All sections complete — ready to submit!"}
-          </p>
-        </div>
-
-        {/* Registration Notice */}
-        <RegistrationNotice />
-
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate aria-label="Team registration form">
-          <div className="space-y-4">
-            {SECTIONS.map((section) => {
-              const isOpen = openSections.includes(section.id);
+        {/* Horizontal Stepper UI */}
+        <div className="mb-10 px-2 sm:px-0">
+          <div className="relative flex justify-between">
+            {SECTIONS.map((section, index) => {
+              const isActive = currentStep === section.id;
+              const isPast = currentStep > section.id;
               const Icon = section.icon;
 
-              // Check if section has errors
-              const hasErrors =
-                (section.id === 1 && (!!errors.teamName || !!errors.department || !!errors.academicYear || !!errors.category)) ||
-                (section.id === 2 && !!errors.members) ||
-                (section.id === 3 && (!!errors.problemStatement || !!errors.ideaTitle || !!errors.ideaDescription)) ||
-                (section.id === 4 && !!errors.presentationFile);
-
               return (
-                <div
-                  key={section.id}
-                  className={cn(
-                    "rounded-2xl border bg-white shadow-sm overflow-hidden transition-all duration-200",
-                    hasErrors ? "border-red-200" : isOpen ? "border-navy-primary/20 shadow-md" : "border-slate-100"
+                <div key={section.id} className="relative z-10 flex flex-col items-center w-1/4">
+                  <div className={cn(
+                    "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2",
+                    isActive ? "bg-navy-primary border-navy-primary text-white shadow-md scale-110" : 
+                    isPast ? "bg-navy-primary border-navy-primary text-white" : "bg-white border-slate-200 text-slate-400"
+                  )}>
+                    {isPast ? <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" /> : <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  </div>
+                  <div className={cn(
+                    "text-[10px] sm:text-xs font-bold mt-2.5 text-center leading-tight transition-colors duration-300",
+                    isActive ? "text-navy-primary" : "text-slate-400"
+                  )}>
+                    {section.title}
+                  </div>
+                  
+                  {/* Connector Line */}
+                  {index < SECTIONS.length - 1 && (
+                    <div className="absolute top-5 sm:top-6 left-[50%] w-[100%] h-0.5 -z-10">
+                      <div className="w-full h-full bg-slate-200" />
+                      <div 
+                        className="absolute top-0 left-0 h-full bg-navy-primary transition-all duration-500 ease-in-out" 
+                        style={{ width: isPast ? '100%' : '0%' }}
+                      />
+                    </div>
                   )}
-                >
-                  {/* Section Header — clickable */}
-                  <button
-                    type="button"
-                    onClick={() => toggleSection(section.id)}
-                    className={cn(
-                      "w-full flex items-center gap-4 px-5 py-4 text-left transition-colors duration-200",
-                      isOpen ? "bg-navy-primary/3" : "hover:bg-slate-50"
-                    )}
-                    aria-expanded={isOpen}
-                    aria-controls={`section-${section.id}-content`}
-                  >
-                    {/* Step number + icon */}
-                    <div className={cn(
-                      "flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 transition-colors duration-200",
-                      section.bgColor
-                    )}>
-                      <Icon className={cn("w-5 h-5", section.color)} />
-                    </div>
-
-                    {/* Title */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                          Section {section.id}
-                        </span>
-                        {hasErrors && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-100 text-error text-xs font-semibold">
-                            Errors
-                          </span>
-                        )}
-                      </div>
-                      <div className="font-bold text-text-primary text-sm sm:text-base mt-0.5">
-                        {section.title}
-                      </div>
-                      <div className="text-xs text-text-muted mt-0.5 hidden sm:block">
-                        {section.description}
-                      </div>
-                    </div>
-
-                    {/* Chevron */}
-                    <div className="flex-shrink-0 text-text-muted">
-                      {isOpen ? (
-                        <ChevronUp className="w-5 h-5" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5" />
-                      )}
-                    </div>
-                  </button>
-
-                  {/* Section Content */}
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        id={`section-${section.id}-content`}
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-5 pb-5 pt-2 border-t border-slate-100">
-                          {section.id === 1 && <Section1TeamInfo />}
-                          {section.id === 2 && <Section2TeamDetails />}
-                          {section.id === 3 && <Section3ProjectDetails />}
-                          {section.id === 4 && <Section4Upload />}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               );
             })}
           </div>
-
-          {/* Submit Button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8 flex flex-col sm:flex-row items-center gap-4"
-          >
-            <Button
-              type="submit"
-              size="xl"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto min-w-48 group"
-              aria-live="polite"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Submitting…
-                </>
-              ) : (
-                <>
-                  <Send className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  Submit Registration
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-text-muted text-center sm:text-left">
-              By submitting, you confirm that all provided information is accurate
-              and that your team meets all eligibility criteria.
-            </p>
-          </motion.div>
-        </form>
-
-        {/* Sticky mobile CTA */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-slate-100 safe-bottom sm:hidden z-40">
-          <Button
-            type="submit"
-            form="registration-form"
-            size="lg"
-            disabled={isSubmitting}
-            onClick={handleSubmit(onSubmit, onError)}
-            className="w-full"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Submitting…
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4" />
-                Submit Registration
-              </>
-            )}
-          </Button>
         </div>
+
+        {/* Registration Notice */}
+        <div className={cn("transition-all duration-300", currentStep > 1 ? "hidden" : "block mb-8")}>
+          <RegistrationNotice />
+        </div>
+
+        {/* Form Body */}
+        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate aria-label="Team registration form">
+          
+          <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden mb-8">
+            <div className="px-5 py-6 sm:p-8">
+              {/* Step Header */}
+              <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-4 border-b border-slate-100 pb-6">
+                <div className={cn(
+                  "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0",
+                  SECTIONS[currentStep - 1].bgColor, SECTIONS[currentStep - 1].color
+                )}>
+                  {(() => { 
+                    const Icon = SECTIONS[currentStep - 1].icon; 
+                    return <Icon className="w-6 h-6" />; 
+                  })()}
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-navy-primary">
+                    Step {currentStep}: {SECTIONS[currentStep - 1].title}
+                  </h2>
+                  <p className="text-sm text-text-muted mt-1 font-medium">
+                    {SECTIONS[currentStep - 1].description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Step Content */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {currentStep === 1 && <Section1TeamInfo />}
+                  {currentStep === 2 && <Section2TeamDetails />}
+                  {currentStep === 3 && <Section3ProjectDetails />}
+                  {currentStep === 4 && <Section4Upload />}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="flex items-center justify-between gap-4">
+            {currentStep > 1 ? (
+              <Button type="button" variant="outline" size="lg" onClick={prevStep} className="w-1/3 sm:w-32 rounded-xl">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            ) : <div />}
+
+            {currentStep < 4 ? (
+              <Button type="button" size="lg" onClick={nextStep} className="w-2/3 sm:w-auto sm:min-w-[160px] rounded-xl bg-navy-primary hover:bg-navy-secondary text-white shadow-lg shadow-navy-primary/20">
+                Next Step
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isSubmitting}
+                className="w-2/3 sm:w-auto sm:min-w-[200px] rounded-xl bg-navy-primary hover:bg-navy-secondary text-white shadow-xl shadow-navy-primary/20"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    Submitting…
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5 mr-2" />
+                    Submit Registration
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </form>
       </div>
     </FormProvider>
   );

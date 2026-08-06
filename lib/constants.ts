@@ -6,9 +6,9 @@ export const COLLEGE = {
   shortName: "SXC Ranchi",
   tagline: "Excellence, Knowledge, Leadership",
   iqac: "Internal Quality Assurance Cell (IQAC)",
-  address: "P.O. Box 7, Ranchi, Jharkhand – 834001",
-  email: "iqac@sxcranchi.ac.in",
-  phone: "+91-651-2360077",
+  address: "",
+  email: "",
+  phone: "+91-9341936886",
   website: "https://sxcranchi.ac.in",
   estYear: "1944",
 };
@@ -74,31 +74,9 @@ export const TIMELINE = [
 // Departments / Streams
 // ─────────────────────────────────────────────────────────────────────────────
 export const DEPARTMENTS = [
-  "B.Sc. Computer Science",
   "B.Sc. Information Technology",
-  "B.Sc. Electronics",
-  "B.Sc. Mathematics",
-  "B.Sc. Physics",
-  "B.Sc. Chemistry",
-  "B.Sc. Botany",
-  "B.Sc. Zoology",
-  "B.Sc. Biotechnology",
-  "B.Com. (Honours)",
-  "B.Com. (General)",
-  "B.A. Economics",
-  "B.A. English",
-  "B.A. History",
-  "B.A. Philosophy",
-  "B.A. Political Science",
-  "B.A. Psychology",
-  "B.A. Sociology",
-  "B.A. Hindi",
+  "B.Sc. Computer Application",
   "BCA",
-  "M.Sc. Computer Science",
-  "M.Sc. Mathematics",
-  "M.A. Economics",
-  "MBA",
-  "Other",
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -109,7 +87,6 @@ export const ACADEMIC_YEARS = [
   "Second Year (2nd)",
   "Third Year (3rd)",
   "Fourth Year (4th)",
-  "Post Graduate (PG)",
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -45,11 +45,11 @@ export default function Section1TeamInfo() {
         <FieldError message={errors.teamName?.message} />
       </div>
 
-      {/* Department / Stream */}
+      {/* Stream */}
       <div>
         <Label htmlFor="department" className="flex items-center gap-1.5 mb-1.5">
           <BookOpen className="w-3.5 h-3.5 text-accent-orange" />
-          Department / Stream <span className="text-error">*</span>
+          Stream <span className="text-error">*</span>
         </Label>
         <Controller
           name="department"
@@ -61,7 +61,7 @@ export default function Section1TeamInfo() {
                 error={!!errors.department}
                 aria-invalid={!!errors.department}
               >
-                <SelectValue placeholder="Select your department" />
+                <SelectValue placeholder="Select your stream" />
               </SelectTrigger>
               <SelectContent>
                 {DEPARTMENTS.map((dept) => (

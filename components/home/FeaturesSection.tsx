@@ -3,15 +3,17 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { Lightbulb, Users, Target, GraduationCap, Globe, Award } from "lucide-react";
+import { Globe, Award } from "lucide-react";
 import { FEATURES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import processLogo from "@/app/images/hackathon-process-logo.png";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Lightbulb,
-  Users,
-  Target,
-  GraduationCap,
+  Lightbulb: require("lucide-react").Lightbulb,
+  Users: require("lucide-react").Users,
+  Target: require("lucide-react").Target,
+  GraduationCap: require("lucide-react").GraduationCap,
   Globe,
   Award,
 };
@@ -26,7 +28,7 @@ interface FeatureCardProps {
 }
 
 function FeatureCard({ title, description, icon, color, iconColor, index }: FeatureCardProps) {
-  const Icon = ICONS[icon] || Lightbulb;
+  const Icon = ICONS[icon] || require("lucide-react").Lightbulb;
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -67,7 +69,7 @@ export default function FeaturesSection() {
   const isHeaderInView = useInView(headerRef, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-20 lg:py-28 bg-background" aria-labelledby="features-heading">
+    <section className="py-16 lg:py-28 bg-background" aria-labelledby="features-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -75,8 +77,13 @@ export default function FeaturesSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-center max-w-2xl mx-auto mb-14"
+          className="text-center max-w-4xl mx-auto mb-14 flex flex-col items-center"
         >
+          {/* MoE / AICTE Header Banner */}
+          <div className="w-full max-w-xl sm:max-w-2xl mx-auto bg-white p-2 sm:p-3 rounded-2xl shadow-sm mb-8">
+            <Image priority src={processLogo} alt="Ministry of Education & AICTE" className="w-full h-auto rounded-xl object-contain" />
+          </div>
+
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 border border-orange-100 text-xs font-semibold text-accent-orange mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-orange" />
             Why Participate

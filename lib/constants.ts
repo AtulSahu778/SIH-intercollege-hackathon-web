@@ -74,13 +74,63 @@ export const TIMELINE = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Departments / Streams
+// SXC Ranchi Department Groups
 // ─────────────────────────────────────────────────────────────────────────────
-export const DEPARTMENTS = [
-  "B.Sc. Information Technology",
-  "B.Sc. Computer Application",
-  "BCA",
+export const DEPARTMENT_GROUPS = [
+  {
+    category: "Computer Science & IT",
+    options: [
+      "B.Sc. Information Technology",
+      "B.Sc. Computer Application",
+      "BCA",
+    ],
+  },
+  {
+    category: "Science",
+    options: [
+      "Physics",
+      "Chemistry",
+      "Mathematics",
+      "Statistics",
+      "Botany",
+      "Zoology",
+      "Geology",
+      "Biotechnology",
+    ],
+  },
+  {
+    category: "Commerce & Management",
+    options: [
+      "Commerce (Regular UG & PG)",
+      "Business Administration (BBA)",
+      "Banking & Insurance",
+      "Financial Market Operation",
+      "International Accounts",
+    ],
+  },
+  {
+    category: "Vocational & Self-Finance",
+    options: [
+      "English Language & Literature",
+      "Animation & Interior Design",
+      "Journalism & Mass Communication",
+      "Advertising & Marketing",
+      "Office Management & Secretarial Practice",
+      "Retail Management",
+      "Building Construction Management",
+      "Fashion Technology",
+    ],
+  },
+  {
+    category: "Arts & Humanities / Others",
+    options: [
+      "Arts & Humanities",
+      "Other Department",
+    ],
+  },
 ];
+
+export const DEPARTMENTS = DEPARTMENT_GROUPS.flatMap((g) => g.options);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Academic Years
@@ -138,8 +188,8 @@ export const FEATURES = [
   },
   {
     icon: "Users",
-    title: "Internal Hackathon",
-    description: "A rigorous selection round held on-campus before SIH 2026 nominations.",
+    title: "Open to All SXC Departments",
+    description: "Open for students across all departments and streams of St. Xavier's College, Ranchi.",
     color: "from-cyan-500/20 to-cyan-600/10",
     iconColor: "text-accent-cyan",
   },

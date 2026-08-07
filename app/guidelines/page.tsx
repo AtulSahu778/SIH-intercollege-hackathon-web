@@ -23,11 +23,11 @@ const SECTIONS = [
     content: (
       <ul className="space-y-3">
         {[
-          "Only currently enrolled students of St. Xavier's College, Ranchi may participate.",
-          "Only Computer Science department students (B.Sc. IT, B.Sc. Computer Application, BCA) are eligible to participate.",
+          "Only currently enrolled students of St. Xavier's College, Ranchi are eligible to participate.",
+          "Students from all academic departments and streams within SXC Ranchi (CS, IT, Science, Commerce, Arts, Vocational, PG) are welcome.",
           "Each team must consist of exactly 6 members (1 Team Leader + 5 Members).",
           "A minimum of 2 female members is mandatory in every team.",
-          "All 6 members must belong to St. Xavier's College, Ranchi. Cross-college teams are not permitted.",
+          "All 6 members must belong to St. Xavier's College, Ranchi. Inter-departmental teams within SXC are encouraged.",
           "One student cannot be part of multiple teams.",
           "Faculty advisors are not counted as team members.",
         ].map((item, i) => (
@@ -84,7 +84,7 @@ const SECTIONS = [
           {
             step: "1",
             title: "Registration Review",
-            desc: "IQAC reviews all registrations for completeness, Computer Science eligibility, and submission format compliance. Non-template or ineligible registrations will be rejected.",
+            desc: "IQAC reviews all registrations for SXC Ranchi student status, completeness, and submission format compliance. Non-template or incomplete registrations will be rejected.",
           },
           {
             step: "2",
@@ -159,7 +159,7 @@ const SECTIONS = [
         {[
           {
             q: "Who is eligible to participate in the hackathon?",
-            a: "Only currently enrolled Computer Science students (B.Sc. Information Technology, B.Sc. Computer Application, BCA) of St. Xavier's College, Ranchi are eligible to participate.",
+            a: "Currently enrolled students of St. Xavier's College, Ranchi from any department, stream, or academic discipline (UG/PG) are eligible to participate.",
           },
           {
             q: "What format should the idea presentation be in?",
@@ -175,7 +175,11 @@ const SECTIONS = [
           },
           {
             q: "Can students from non-Computer Science streams participate?",
-            a: "No. The Internal SIH selection round is strictly for Computer Science students (B.Sc. IT, B.Sc. CA, BCA).",
+            a: "Yes! The hackathon is open to students from all departments and streams of SXC Ranchi.",
+          },
+          {
+            q: "Can students from other colleges participate?",
+            a: "No. The Internal SIH selection round is exclusively for students enrolled in St. Xavier's College, Ranchi.",
           },
           {
             q: "Will there be internet access and electricity during the hackathon?",

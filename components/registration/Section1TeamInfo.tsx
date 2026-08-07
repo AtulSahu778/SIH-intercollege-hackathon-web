@@ -4,10 +4,10 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+  Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { AlertCircle, Users, Layers, BookOpen, Tag } from "lucide-react";
-import { DEPARTMENTS, ACADEMIC_YEARS, CATEGORIES } from "@/lib/constants";
+import { DEPARTMENT_GROUPS, ACADEMIC_YEARS, CATEGORIES } from "@/lib/constants";
 import { RegistrationSchemaType } from "@/lib/validation/registrationSchema";
 
 
@@ -45,11 +45,11 @@ export default function Section1TeamInfo() {
         <FieldError message={errors.teamName?.message} />
       </div>
 
-      {/* Stream */}
+      {/* Stream / Department */}
       <div>
         <Label htmlFor="department" className="flex items-center gap-1.5 mb-1.5">
           <BookOpen className="w-3.5 h-3.5 text-accent-orange" />
-          Stream <span className="text-error">*</span>
+          Department / Stream <span className="text-error">*</span>
         </Label>
         <Controller
           name="department"
@@ -61,13 +61,18 @@ export default function Section1TeamInfo() {
                 error={!!errors.department}
                 aria-invalid={!!errors.department}
               >
-                <SelectValue placeholder="Select your stream" />
+                <SelectValue placeholder="Select your department" />
               </SelectTrigger>
               <SelectContent>
-                {DEPARTMENTS.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
+                {DEPARTMENT_GROUPS.map((group) => (
+                  <SelectGroup key={group.category}>
+                    <SelectLabel>{group.category}</SelectLabel>
+                    {group.options.map((dept) => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>

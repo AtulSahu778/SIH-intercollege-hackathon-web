@@ -69,9 +69,9 @@ export default function HeroSection() {
                 
                 {/* Main Badge */}
                 <div className="relative flex flex-col sm:flex-row items-center gap-1.5 sm:gap-4 px-5 sm:px-6 py-2 sm:py-2.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-full shadow-2xl">
-                  {/* Department */}
+                  {/* Scope */}
                   <span className="text-[11px] sm:text-xs font-semibold text-white tracking-wide text-center">
-                    Department of Computer Science
+                    SXC Ranchi · Open to All Departments
                   </span>
                   
                   {/* Separator (Hidden on mobile) */}

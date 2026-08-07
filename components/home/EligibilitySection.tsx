@@ -10,8 +10,8 @@ import { ArrowRight } from "lucide-react";
 const ELIGIBILITY_ITEMS = [
   {
     icon: Laptop,
-    title: "Computer Science Students Only",
-    description: "Participation is open exclusively to Computer Science students (B.Sc. IT, B.Sc. CA, BCA) of SXC Ranchi.",
+    title: "All SXC Departments Eligible",
+    description: "Participation is open to students from all departments and streams of SXC Ranchi.",
     color: "text-accent-orange",
     bgColor: "bg-orange-50",
     borderColor: "border-orange-100",
@@ -42,7 +42,7 @@ const ELIGIBILITY_ITEMS = [
   },
   {
     icon: Building,
-    title: "Same College (SXC Ranchi)",
+    title: "Same College (SXC Ranchi Only)",
     description: "All 6 team members must be currently enrolled students of St. Xavier's College, Ranchi.",
     color: "text-success",
     bgColor: "bg-emerald-50",
@@ -122,7 +122,7 @@ export default function EligibilitySection() {
               <span className="text-gradient">participate?</span>
             </h2>
             <p className="mt-3 text-xs sm:text-base text-text-muted leading-relaxed">
-              The Internal SIH 2026 is open exclusively to Computer Science students (B.Sc. IT, B.Sc. CA, BCA) of St. Xavier&apos;s College, Ranchi.
+              The Internal SIH 2026 is open to students across all departments and streams of St. Xavier&apos;s College, Ranchi.
               Please read the eligibility rules carefully before registering.
             </p>
 

@@ -16,7 +16,7 @@ export default function RegistrationNotice() {
   const rules = [
     {
       icon: Laptop,
-      text: "Only Computer Science students (B.Sc. IT, B.Sc. CA, BCA) are eligible.",
+      text: "Open to students from all departments & streams of SXC Ranchi!",
       color: "text-accent-orange",
       bg: "bg-orange-50",
     },

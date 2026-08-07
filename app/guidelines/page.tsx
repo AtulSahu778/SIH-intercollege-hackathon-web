@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { COLLEGE, HACKATHON } from "@/lib/constants";
+import { COLLEGE, HACKATHON, TEMPLATE } from "@/lib/constants";
 import {
   Accordion, AccordionItem, AccordionTrigger, AccordionContent
 } from "@/components/ui/accordion";
 import {
   Users, ClipboardCheck, Star, BarChart3, HelpCircle,
-  BookOpen, CheckCircle2, AlertCircle
+  BookOpen, CheckCircle2, AlertCircle, Download, FileText
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -24,12 +24,12 @@ const SECTIONS = [
       <ul className="space-y-3">
         {[
           "Only currently enrolled students of St. Xavier's College, Ranchi may participate.",
+          "Only Computer Science department students (B.Sc. IT, B.Sc. Computer Application, BCA) are eligible to participate.",
           "Each team must consist of exactly 6 members (1 Team Leader + 5 Members).",
           "A minimum of 2 female members is mandatory in every team.",
-          "All 6 members must belong to the same college. Cross-college teams are not permitted.",
+          "All 6 members must belong to St. Xavier's College, Ranchi. Cross-college teams are not permitted.",
           "One student cannot be part of multiple teams.",
           "Faculty advisors are not counted as team members.",
-          "Students from any department or stream (UG or PG) are eligible.",
         ].map((item, i) => (
           <li key={i} className="flex items-start gap-2.5 text-sm">
             <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
@@ -55,9 +55,10 @@ const SECTIONS = [
         </div>
         <ul className="space-y-3">
           {[
+            "Mandatory Template Format: You MUST download and use ONLY the official SIH 2026 Idea Presentation PPT template (SIH2025-IDEA-Presentation-Format.pptx). No other custom format will be accepted.",
             "Only one registration is allowed per team. Duplicate entries will be disqualified.",
             "All information provided must be accurate. Misrepresentation will result in disqualification.",
-            "Upload your idea presentation as a PDF (max 10 MB).",
+            "Upload your idea presentation following the official template as PDF or PPTX (max 10 MB).",
             "Registrations are accepted only through this online portal — offline/email submissions will not be considered.",
             "Ensure all 6 member email addresses and mobile numbers are unique and valid.",
             "Once submitted, changes to registration can only be made by contacting IQAC directly.",
@@ -83,7 +84,7 @@ const SECTIONS = [
           {
             step: "1",
             title: "Registration Review",
-            desc: "IQAC reviews all registrations for completeness and eligibility. Incomplete or ineligible registrations will be rejected.",
+            desc: "IQAC reviews all registrations for completeness, Computer Science eligibility, and submission format compliance. Non-template or ineligible registrations will be rejected.",
           },
           {
             step: "2",
@@ -132,7 +133,7 @@ const SECTIONS = [
           { criterion: "Problem Relevance", weight: "20%", desc: "Does the solution address a real-world or national-level problem?" },
           { criterion: "Technical Feasibility", weight: "20%", desc: "Is the proposed solution technically sound and implementable?" },
           { criterion: "Prototype / Demo", weight: "20%", desc: "Quality and completeness of the working prototype or demo." },
-          { criterion: "Presentation & Communication", weight: "15%", desc: "Clarity and effectiveness of the team's presentation." },
+          { criterion: "Presentation & Communication", weight: "15%", desc: "Clarity and adherence to the official SIH idea presentation format." },
         ].map((item) => (
           <div key={item.criterion} className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
             <div className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20">
@@ -157,8 +158,12 @@ const SECTIONS = [
       <div className="space-y-5">
         {[
           {
-            q: "Can students from different departments form a team?",
-            a: "Yes! Cross-department teams are encouraged as long as all members are enrolled at St. Xavier's College, Ranchi.",
+            q: "Who is eligible to participate in the hackathon?",
+            a: "Only currently enrolled Computer Science students (B.Sc. Information Technology, B.Sc. Computer Application, BCA) of St. Xavier's College, Ranchi are eligible to participate.",
+          },
+          {
+            q: "What format should the idea presentation be in?",
+            a: "Teams MUST download and use ONLY the official SIH 2026 Idea Presentation Template (SIH2025-IDEA-Presentation-Format.pptx). Submissions in any other custom presentation format will be disqualified.",
           },
           {
             q: "Can the same idea be submitted by two different teams?",
@@ -166,15 +171,11 @@ const SECTIONS = [
           },
           {
             q: "What if our team has fewer than 6 members?",
-            a: "Strictly, 6 members are required. Teams with fewer members will not be considered eligible and their registration will be rejected.",
+            a: "Strictly, 6 members are required (minimum 2 female members). Teams with fewer members will not be considered eligible and their registration will be rejected.",
           },
           {
-            q: "Can PG students team up with UG students?",
-            a: "Yes. There is no restriction on mixing UG and PG students within a team, as long as all are enrolled at SXC Ranchi.",
-          },
-          {
-            q: "What format should the idea presentation be in?",
-            a: "The presentation must be submitted as a PDF file (max 10 MB). PowerPoint, Word, or other formats are not accepted.",
+            q: "Can students from non-Computer Science streams participate?",
+            a: "No. The Internal SIH selection round is strictly for Computer Science students (B.Sc. IT, B.Sc. CA, BCA).",
           },
           {
             q: "Will there be internet access and electricity during the hackathon?",
@@ -186,7 +187,7 @@ const SECTIONS = [
           },
           {
             q: "My team wants to change the team leader. Is that possible?",
-            a: "After submission, changes can only be made by contacting IQAC directly at iqac@sxcranchi.ac.in.",
+            a: "After submission, changes can only be made by contacting IQAC directly.",
           },
         ].map((item, i) => (
           <div key={i} className="border-l-2 border-accent-cyan/30 pl-4">
@@ -228,7 +229,37 @@ export default function GuidelinesPage() {
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Accordion type="multiple" defaultValue={["eligibility"]} className="space-y-3">
+        {/* Mandatory Template Download Card */}
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-navy-primary/5 border border-orange-200/80 shadow-md">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-accent-orange/15 border border-accent-orange/30 flex items-center justify-center flex-shrink-0">
+                <FileText className="w-6 h-6 text-accent-orange" />
+              </div>
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-orange text-white text-[11px] font-bold uppercase tracking-wider mb-1">
+                  Mandatory Submission Format
+                </span>
+                <h3 className="font-bold text-navy-primary text-base sm:text-lg">
+                  Official SIH 2026 Idea Presentation Template
+                </h3>
+                <p className="text-xs sm:text-sm text-text-muted mt-1 leading-relaxed">
+                  All teams <strong className="text-navy-primary">MUST</strong> submit their presentation using ONLY this official PowerPoint template (<code className="text-accent-orange font-semibold">{TEMPLATE.filename}</code>). Custom presentation formats will be rejected.
+                </p>
+              </div>
+            </div>
+            <a
+              href={TEMPLATE.downloadUrl}
+              download={TEMPLATE.filename}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-semibold text-sm shadow-md transition-all duration-200 flex-shrink-0 group"
+            >
+              <Download className="w-4 h-4 text-accent-cyan group-hover:translate-y-0.5 transition-transform" />
+              <span>Download Template (.pptx)</span>
+            </a>
+          </div>
+        </div>
+
+        <Accordion type="multiple" defaultValue={["eligibility", "registration-rules"]} className="space-y-3">
           {SECTIONS.map((section) => {
             const Icon = section.icon;
             return (

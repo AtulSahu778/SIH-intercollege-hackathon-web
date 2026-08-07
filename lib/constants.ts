@@ -22,7 +22,10 @@ export const HACKATHON = {
   year: "2026",
   edition: "SIH 2026 Internal Selection Round",
   sihUrl: "https://sih.gov.in",
+  whatsappUrl: "https://chat.whatsapp.com/LZWZi1rK36VJTrDY1sqtLG?s=cl&p=a&ilr=0",
 };
+
+export const WHATSAPP_GROUP_URL = HACKATHON.whatsappUrl;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Timeline
@@ -109,6 +112,18 @@ export const VALIDATION = {
   MAX_DESCRIPTION_WORDS: 300,
   TEAM_ID_PREFIX: "SIH-2026",
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Idea Presentation Template Info
+// ─────────────────────────────────────────────────────────────────────────────
+export const TEMPLATE = {
+  name: "Official SIH Idea Presentation Format",
+  filename: "SIH2025-IDEA-Presentation-Format.pptx",
+  downloadUrl: "/api/template",
+  format: "PPTX / PDF",
+  description: "Official presentation template prescribed for Smart India Hackathon. Teams MUST download and strictly follow this template format. Submissions in any other format will be disqualified.",
+};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Feature Cards

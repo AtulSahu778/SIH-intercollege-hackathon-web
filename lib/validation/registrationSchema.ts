@@ -97,10 +97,19 @@ export const registrationSchema = z
   .refine(
     (data) => {
       if (!data.presentationFile) return true;
-      return data.presentationFile.type === "application/pdf";
+      const fileName = data.presentationFile.name.toLowerCase();
+      const mimeType = data.presentationFile.type;
+      return (
+        mimeType === "application/pdf" ||
+        mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+        mimeType === "application/vnd.ms-powerpoint" ||
+        fileName.endsWith(".pdf") ||
+        fileName.endsWith(".pptx") ||
+        fileName.endsWith(".ppt")
+      );
     },
     {
-      message: "Only PDF files are accepted",
+      message: "Please upload your presentation as a PDF or PPTX file using the official template",
       path: ["presentationFile"],
     }
   );

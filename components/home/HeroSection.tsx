@@ -55,22 +55,38 @@ export default function HeroSection() {
             className="text-center flex flex-col items-center w-full"
           >
             {/* PM Banner */}
-            <motion.div variants={itemVariants} className="w-full max-w-5xl mx-auto mb-8 sm:mb-10 rounded-3xl overflow-hidden shadow-2xl relative group">
-               <Image priority src={pmBanner} alt="Smart India Hackathon PM Banner" className="w-full h-auto object-contain transform group-hover:scale-105 transition-transform duration-700" />
+            <motion.div variants={itemVariants} className="w-full max-w-6xl mx-auto mb-8 sm:mb-10 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-navy-secondary/50 relative group bg-black/10">
+               <Image priority src={pmBanner} alt="Smart India Hackathon PM Banner" className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700" />
             </motion.div>
 
             {/* Top badge */}
-            <motion.div variants={itemVariants} className="flex items-center justify-center mb-5 sm:mb-6 px-2">
-              <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 py-1 text-[11px] sm:text-sm font-medium text-white/90 text-center max-w-full">
-                <span className="font-bold text-white tracking-tight">St. Xavier&apos;s College, Ranchi</span>
-                <span className="text-white/60 font-normal text-[10px] sm:text-xs uppercase tracking-wider px-0.5">presents</span>
-                <span className="font-black bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent drop-shadow-sm">
-                  Internal SIH 2026
-                </span>
-                <span className="text-white/60 font-normal text-[10px] sm:text-xs uppercase tracking-wider px-0.5">in association with</span>
-                <span className="inline-flex items-center gap-1 font-semibold text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-full text-[11px] sm:text-xs">
-                  IQAC
-                </span>
+            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center mb-8 px-2">
+              <div className="group relative inline-flex items-center justify-center">
+                {/* Subtle ambient border glow */}
+                <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-orange/40 via-accent-cyan/40 to-accent-orange/40 rounded-full blur-sm opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-300" />
+                
+                {/* Main Badge */}
+                <div className="relative flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2 sm:py-2.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl">
+                  {/* Department */}
+                  <span className="text-[11px] sm:text-xs font-semibold text-white tracking-wide">
+                    Department of Computer Science
+                  </span>
+                  
+                  {/* Separator */}
+                  <span className="w-px h-3.5 bg-white/20" />
+                  
+                  {/* Event */}
+                  <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.15em] bg-gradient-to-r from-accent-orange to-amber-300 bg-clip-text text-transparent">
+                    Internal SIH 2026
+                  </span>
+                </div>
+              </div>
+
+              {/* Minimal Association Subtitle */}
+              <div className="mt-5 flex items-center gap-3 sm:gap-4 opacity-50">
+                <span className="h-px w-6 sm:w-10 bg-gradient-to-r from-transparent to-white/40" />
+                <span className="text-[9px] sm:text-[10px] font-medium tracking-[0.2em] text-white uppercase">In Association with IQAC</span>
+                <span className="h-px w-6 sm:w-10 bg-gradient-to-l from-transparent to-white/40" />
               </div>
             </motion.div>
 

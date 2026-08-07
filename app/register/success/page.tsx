@@ -1,20 +1,34 @@
 "use client";
 
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Suspense } from "react";
 import {
-  CheckCircle2, Download, Printer, Home, Copy, CalendarDays, Trophy
+  CheckCircle2, Download, Printer, Home, Copy, CalendarDays, Trophy, MessageCircle, ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { COLLEGE, HACKATHON } from "@/lib/constants";
+import { COLLEGE, HACKATHON, WHATSAPP_GROUP_URL } from "@/lib/constants";
 
 // Type declaration for print window flag
 declare global {
   interface Window {
     __printWindowOpen?: boolean;
   }
+}
+
+// Official WhatsApp SVG Icon Component
+function WhatsAppIcon({ className = "w-6 h-6" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.74.949 3.71 1.45 5.71 1.45h.005c6.554 0 11.89-5.335 11.893-11.893 0-3.18-1.238-6.167-3.488-8.414" />
+    </svg>
+  );
 }
 
 async function downloadPDF(teamId: string, teamName: string, ideaTitle: string) {
@@ -29,6 +43,20 @@ function SuccessContent() {
   const teamId   = params.get("teamId")    || "SIH-2026-001";
   const teamName = params.get("teamName")  || "Your Team";
   const ideaTitle = params.get("ideaTitle") || "Your Idea";
+
+  const [hasRedirected, setHasRedirected] = useState(false);
+
+  // Automatically redirect / open WhatsApp group after successful submission
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasRedirected) {
+        setHasRedirected(true);
+        window.open(WHATSAPP_GROUP_URL, "_blank");
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [hasRedirected]);
 
   const copyTeamId = async () => {
     await navigator.clipboard.writeText(teamId);
@@ -285,9 +313,9 @@ function SuccessContent() {
       </div>
       <div class="split-grid">
         <div class="steps-list">
-          <div class="step"><div class="step-n">1</div><div class="step-t">Your registration is under review by IQAC</div></div>
-          <div class="step"><div class="step-n">2</div><div class="step-t">You&apos;ll receive confirmation at your registered email</div></div>
-          <div class="step"><div class="step-n">3</div><div class="step-t">Watch for hackathon schedule and venue details</div></div>
+          <div class="step"><div class="step-n">1</div><div class="step-t">Join official WhatsApp group for updates</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-t">Your registration is under review by IQAC</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-t">You&apos;ll receive confirmation at your registered email</div></div>
           <div class="step"><div class="step-n">4</div><div class="step-t">Shortlisted teams will be announced after evaluation</div></div>
         </div>
         
@@ -357,9 +385,9 @@ function SuccessContent() {
   };
 
   const nextSteps = [
+    "Join the official participant WhatsApp group",
     "Your registration is under review by IQAC",
     "You'll receive confirmation at your registered email",
-    "Watch for hackathon schedule and venue details",
     "Shortlisted teams will be announced after evaluation",
   ];
 
@@ -407,6 +435,48 @@ function SuccessContent() {
               <span className="text-white font-semibold">{HACKATHON.name}</span> at {COLLEGE.shortName}.
             </motion.p>
           </div>
+
+          {/* ── WHATSAPP GROUP AUTO-JOIN CARD ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="mx-6 sm:mx-10 mt-6 p-6 rounded-3xl bg-gradient-to-br from-[#25D366] via-[#128C7E] to-[#075E54] text-white shadow-2xl shadow-[#25D366]/25 border border-white/20 relative overflow-hidden group"
+          >
+            {/* Background Glow Orbs */}
+            <div className="absolute -right-12 -top-12 w-40 h-40 bg-white/20 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
+            <div className="absolute -left-12 -bottom-12 w-32 h-32 bg-[#25D366]/30 rounded-full blur-xl pointer-events-none" />
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 relative z-10">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/30 backdrop-blur-md flex items-center justify-center flex-shrink-0 shadow-lg shadow-black/10">
+                  <WhatsAppIcon className="w-8 h-8 text-white fill-current" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="px-3 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider border border-white/20">
+                      Action Required
+                    </span>
+                  </div>
+                  <h3 className="font-black text-white text-lg sm:text-xl tracking-tight leading-tight">
+                    Join & Share Official SIH WhatsApp Group
+                  </h3>
+                  <p className="text-xs sm:text-sm text-white/95 mt-1 leading-relaxed max-w-md">
+                    <strong>Team Leaders:</strong> Join the group now and <strong className="underline underline-offset-2 decoration-white/50">share this link with all 5 of your team members</strong> so your entire team receives official hackathon updates & schedule announcements!
+                  </p>
+                </div>
+              </div>
+              
+              <a
+                href={WHATSAPP_GROUP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-white text-[#075E54] hover:bg-emerald-50 font-black text-sm shadow-xl hover:shadow-2xl transition-all duration-300 shrink-0 transform hover:-translate-y-0.5 active:scale-95 group/btn border border-white"
+              >
+                <WhatsAppIcon className="w-5 h-5 text-[#25D366] fill-current group-hover/btn:scale-110 transition-transform" />
+                <span>Join Group Now</span>
+                <ExternalLink className="w-4 h-4 text-[#075E54]/70 group-hover/btn:translate-x-0.5 transition-transform" />
+              </a>
+            </div>
+          </motion.div>
 
           {/* ── TICKET ID ── */}
           <motion.div 

@@ -2,19 +2,27 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Check, UserCheck, Users, UserPlus, Building, ClipboardCheck } from "lucide-react";
+import { Check, UserCheck, Users, UserPlus, Building, Laptop, FileText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const ELIGIBILITY_ITEMS = [
   {
-    icon: UserCheck,
-    title: "Team Leader Registers",
-    description: "Only the designated team leader completes this registration form on behalf of the entire team.",
+    icon: Laptop,
+    title: "Computer Science Students Only",
+    description: "Participation is open exclusively to Computer Science students (B.Sc. IT, B.Sc. CA, BCA) of SXC Ranchi.",
     color: "text-accent-orange",
     bgColor: "bg-orange-50",
     borderColor: "border-orange-100",
+  },
+  {
+    icon: UserCheck,
+    title: "Team Leader Registers",
+    description: "Only the designated team leader completes this registration form on behalf of the entire team.",
+    color: "text-blue-500",
+    bgColor: "bg-blue-50",
+    borderColor: "border-blue-100",
   },
   {
     icon: Users,
@@ -41,12 +49,12 @@ const ELIGIBILITY_ITEMS = [
     borderColor: "border-emerald-100",
   },
   {
-    icon: ClipboardCheck,
-    title: "One Registration Per Team",
-    description: "Each team can submit only one registration. Duplicate registrations will be rejected.",
-    color: "text-blue-500",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-100",
+    icon: FileText,
+    title: "Official Template Format",
+    description: "Presentations MUST strictly follow the official SIH PPT format (SIH2025-IDEA-Presentation-Format.pptx).",
+    color: "text-amber-600",
+    bgColor: "bg-amber-50",
+    borderColor: "border-amber-100",
   },
 ];
 
@@ -114,7 +122,7 @@ export default function EligibilitySection() {
               <span className="text-gradient">participate?</span>
             </h2>
             <p className="mt-3 text-xs sm:text-base text-text-muted leading-relaxed">
-              The Internal SIH 2026 is open to all students of St. Xavier&apos;s College, Ranchi.
+              The Internal SIH 2026 is open exclusively to Computer Science students (B.Sc. IT, B.Sc. CA, BCA) of St. Xavier&apos;s College, Ranchi.
               Please read the eligibility rules carefully before registering.
             </p>
 

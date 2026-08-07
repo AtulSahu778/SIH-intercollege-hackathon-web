@@ -23,14 +23,32 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [, setIsHeroSection] = useState(true);
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      setIsHeroSection(window.scrollY < 80);
+      const currentScrollY = window.scrollY;
+      
+      setScrolled(currentScrollY > 20);
+
+      // Auto-hide when scrolling down, show when scrolling up
+      if (currentScrollY > 80) {
+        if (currentScrollY > lastScrollY.current + 8) {
+          // Scrolling DOWN -> Hide navbar for distraction-free reading/form filling
+          setVisible(false);
+        } else if (currentScrollY < lastScrollY.current - 8) {
+          // Scrolling UP -> Reveal navbar smoothly
+          setVisible(true);
+        }
+      } else {
+        setVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -48,8 +66,10 @@ export default function Navbar() {
   return (
     <>
       <div className={cn(
-        "fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 pointer-events-none print:hidden",
-        scrolled ? "top-4 px-4 sm:px-6" : "top-4 px-4 sm:px-6"
+        "fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 print:hidden top-4 px-4 sm:px-6",
+        visible || isOpen
+          ? "translate-y-0 opacity-100 pointer-events-auto"
+          : "-translate-y-28 opacity-0 pointer-events-none"
       )}>
         <header
           className={cn(

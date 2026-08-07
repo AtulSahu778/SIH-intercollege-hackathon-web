@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "St. Xavier's College, Ranchi — Innovation Cell" }],
   creator: "SXC Ranchi IQAC",
+  icons: {
+    icon: "/api/image",
+    apple: "/api/image",
+    shortcut: "/api/image",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -39,13 +44,23 @@ export const metadata: Metadata = {
     title: "Internal SIH 2026 | St. Xavier's College, Ranchi",
     description:
       "Register your team for the Internal Smart India Hackathon 2026. Build innovative solutions. Represent SXC at SIH 2026.",
+    images: [
+      {
+        url: "/api/image",
+        width: 1200,
+        height: 630,
+        alt: "Internal SIH 2026 at St. Xavier's College Ranchi",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Internal SIH 2026 | St. Xavier's College, Ranchi",
     description:
       "Register your team for the Internal Smart India Hackathon 2026 at SXC Ranchi.",
+    images: ["/api/image"],
   },
+
   robots: {
     index: true,
     follow: true,

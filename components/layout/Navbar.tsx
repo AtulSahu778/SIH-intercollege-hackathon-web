@@ -144,10 +144,10 @@ export default function Navbar() {
             {/* Mobile Hamburger */}
             <button
               className={cn(
-                "md:hidden flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 active:scale-95 focus:outline-none",
+                "md:hidden flex items-center justify-center w-11 h-11 -mr-2 rounded-xl transition-colors duration-200 focus:outline-none touch-target",
                 isOpen
-                  ? "bg-accent-orange text-white shadow-lg shadow-orange-500/30"
-                  : "bg-slate-100/90 hover:bg-slate-200/80 text-navy-primary border border-slate-200/70"
+                  ? "bg-slate-100 text-navy-primary"
+                  : "bg-transparent active:bg-slate-100 text-navy-primary"
               )}
               onClick={() => setIsOpen(!isOpen)}
               aria-expanded={isOpen}
@@ -163,7 +163,7 @@ export default function Navbar() {
                     exit={{ rotate: 90, scale: 0.75, opacity: 0 }}
                     transition={{ duration: 0.18, ease: "easeOut" }}
                   >
-                    <X className="w-5 h-5 stroke-[2.5]" />
+                    <X className="w-5 h-5 stroke-[2]" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -173,7 +173,7 @@ export default function Navbar() {
                     exit={{ rotate: -90, scale: 0.75, opacity: 0 }}
                     transition={{ duration: 0.18, ease: "easeOut" }}
                   >
-                    <Menu className="w-5 h-5 stroke-[2.5]" />
+                    <Menu className="w-5 h-5 stroke-[2]" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -204,7 +204,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.96 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-20 left-4 right-4 z-50 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden md:hidden"
+              className="fixed top-24 left-4 right-4 z-50 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden md:hidden"
             >
               <nav className="p-4 space-y-1.5" aria-label="Mobile navigation">
                 {NAV_LINKS.map((link, index) => (

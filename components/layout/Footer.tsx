@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Phone, ExternalLink, Heart } from "lucide-react";
+import { Phone, ExternalLink } from "lucide-react";
 import { COLLEGE, HACKATHON, WHATSAPP_GROUP_URL } from "@/lib/constants";
 import Image from "next/image";
 import sihLogo from "@/app/images/SIH2026-logo.png";
@@ -150,7 +150,7 @@ export default function Footer() {
             © {currentYear} <span className="font-semibold text-white/60">{COLLEGE.shortName}</span>. All rights reserved.
           </p>
           <p className="flex items-center gap-1.5">
-            Designed & Developed with <Heart className="w-4 h-4 text-accent-orange fill-accent-orange animate-pulse" /> by{" "}
+            Developed by{" "}
             <a href="https://github.com/atulsahu" target="_blank" rel="noreferrer" className="text-white/80 font-semibold hover:text-white transition-colors hover:underline underline-offset-4 decoration-accent-orange/50">
               Atul Sahu
             </a>

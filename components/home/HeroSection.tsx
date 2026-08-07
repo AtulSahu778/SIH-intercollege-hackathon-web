@@ -114,16 +114,16 @@ export default function HeroSection() {
             {/* Stats mini bar */}
             <motion.div
               variants={itemVariants}
-              className="flex items-center justify-center gap-6 mt-8"
+              className="flex items-start justify-center gap-6 sm:gap-10 mt-8"
             >
               {[
                 { value: "24", label: "Hour Hackathon" },
                 { value: "6", label: "Members/Team" },
                 { value: "SIH", label: "Nomination Awaits" },
               ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-2xl font-black text-white">{stat.value}</div>
-                  <div className="text-xs text-white/40 font-medium mt-0.5 leading-tight">{stat.label}</div>
+                <div key={stat.label} className="text-center w-24">
+                  <div className="text-2xl font-black text-white leading-none">{stat.value}</div>
+                  <div className="text-[11px] sm:text-xs text-white/40 font-medium mt-1.5 leading-tight">{stat.label}</div>
                 </div>
               ))}
             </motion.div>

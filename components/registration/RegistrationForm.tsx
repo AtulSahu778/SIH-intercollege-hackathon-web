@@ -76,13 +76,11 @@ export default function RegistrationForm() {
     mode: "onTouched",
     defaultValues: {
       teamName: "",
-      department: [],
+      department: "",
       academicYear: "",
       category: undefined,
       members: defaultMembers,
-      problemStatement: "",
-      ideaTitle: "",
-      ideaDescription: "",
+
     },
   });
 
@@ -147,18 +145,14 @@ export default function RegistrationForm() {
     });
 
     try {
-      const deptStr = Array.isArray(data.department)
-        ? data.department.join(", ")
-        : data.department || "";
-
       const payload = {
         teamName: data.teamName,
-        department: deptStr,
+        department: data.department,
         academicYear: data.academicYear,
         category: data.category,
-        problemStatement: data.problemStatement || "",
-        ideaTitle: data.ideaTitle || "",
-        ideaDescription: data.ideaDescription || "",
+        problemStatement: "",
+        ideaTitle: "",
+        ideaDescription: "",
         members: data.members,
         pdfBase64: "",
         pdfFileName: "",

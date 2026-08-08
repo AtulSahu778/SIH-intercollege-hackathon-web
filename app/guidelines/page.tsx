@@ -134,7 +134,7 @@ const SECTIONS = [
             { item: "Full details of all 6 members — name, gender, email, mobile", required: true },
             { item: "Selected problem statement / innovation category", required: true },
             { item: "Idea title & short description", required: true },
-            { item: "Authorization Letter — on college letterhead, listing all 6 members + up to 2 mentors, signed by the Principal/Director", required: true },
+            { item: "Authorization Letter — on college letterhead, listing all 6 members + up to 2 mentors", required: false },
             { item: "Idea Presentation (PDF) — must use the official SIH 2026 template", required: false },
           ].map(({ item, required }, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm">
@@ -147,7 +147,7 @@ const SECTIONS = [
           ))}
         </ul>
         <p className="text-xs text-text-muted bg-slate-50 border border-slate-100 rounded-xl p-3 leading-relaxed">
-          📌 The <strong>Authorization Letter</strong> is mandatory for the grand finale. Prepare it on college letterhead and get it signed by the Principal before the event.
+          📌 The <strong>Authorization Letter</strong> is mandatory for the grand finale. Prepare it on college letterhead.
         </p>
       </div>
     ),

@@ -70,20 +70,20 @@ export default function Section1TeamInfo() {
 
             return (
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4">
                   <Label className="flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-accent-orange" />
-                    Department(s) / Stream(s) <span className="text-error">*</span>
+                    <BookOpen className="w-3.5 h-3.5 text-accent-orange flex-shrink-0" />
+                    <span>Department(s) / Stream(s) <span className="text-error">*</span></span>
                   </Label>
                   {selectedValues.length > 0 && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 ml-auto">
                       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-navy-primary/10 text-navy-primary border border-navy-primary/20">
                         {selectedValues.length} Selected
                       </span>
                       <button
                         type="button"
                         onClick={() => field.onChange([])}
-                        className="text-[11px] text-slate-400 hover:text-navy-primary font-medium transition-colors"
+                        className="text-[11px] text-slate-400 hover:text-navy-primary font-medium transition-colors px-1 py-0.5"
                       >
                         Clear
                       </button>
@@ -109,14 +109,14 @@ export default function Section1TeamInfo() {
                               type="button"
                               key={dept}
                               onClick={() => toggleDept(dept)}
-                              className={`group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 border text-left ${
+                              className={`group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 border text-left flex-initial max-w-full ${
                                 isSelected
                                   ? "bg-navy-primary text-white border-navy-primary shadow-sm scale-[1.02]"
                                   : "bg-white text-slate-700 border-slate-200 hover:border-navy-primary/40 hover:bg-slate-50"
                               }`}
                             >
                               <div
-                                className={`w-4 h-4 rounded-md flex items-center justify-center border transition-colors ${
+                                className={`w-4 h-4 rounded-md flex-shrink-0 flex items-center justify-center border transition-colors ${
                                   isSelected
                                     ? "bg-white text-navy-primary border-white"
                                     : "border-slate-300 group-hover:border-navy-primary"
@@ -128,7 +128,7 @@ export default function Section1TeamInfo() {
                                   <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-navy-primary transition-colors" />
                                 )}
                               </div>
-                              <span>{dept}</span>
+                              <span className="leading-snug break-words whitespace-normal">{dept}</span>
                             </button>
                           );
                         })}

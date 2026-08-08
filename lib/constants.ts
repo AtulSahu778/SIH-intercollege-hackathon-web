@@ -148,7 +148,6 @@ export const ACADEMIC_YEARS = [
 export const CATEGORIES = [
   { value: "software", label: "Software", description: "Apps, platforms, AI/ML solutions" },
   { value: "hardware", label: "Hardware", description: "IoT, embedded systems, robotics" },
-  { value: "student_innovation", label: "Student Innovation", description: "Novel ideas & research prototypes" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

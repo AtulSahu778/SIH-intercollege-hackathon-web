@@ -28,7 +28,7 @@ export const registrationSchema = z
       z.string().min(1, "Please select at least one department")
     ]),
     academicYear: z.string().min(1, "Please select academic year"),
-    category: z.enum(["software", "hardware", "student_innovation"], {
+    category: z.enum(["software", "hardware"], {
       errorMap: () => ({ message: "Please select a hackathon category" }),
     }),
 

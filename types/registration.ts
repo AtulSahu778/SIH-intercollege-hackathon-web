@@ -5,7 +5,7 @@
 export type Gender = "Male" | "Female" | "Other" | "Prefer not to say";
 export type MemberType = "Leader" | "Member";
 export type RegistrationStatus = "Pending" | "Approved" | "Rejected";
-export type HackathonCategory = "software" | "hardware" | "student_innovation";
+export type HackathonCategory = "software" | "hardware";
 
 export interface TeamMember {
   memberType: MemberType;

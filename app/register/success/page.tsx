@@ -31,7 +31,7 @@ function WhatsAppIcon({ className = "w-6 h-6" }: { className?: string }) {
   );
 }
 
-async function downloadPDF(teamId: string, teamName: string, ideaTitle: string) {
+async function downloadPDF(teamId: string, teamName: string, ideaTitle?: string) {
   const { generateAcknowledgementPDF } = await import("@/lib/pdf/generateAcknowledgement");
   generateAcknowledgementPDF({ teamId, teamName, ideaTitle, department: "", academicYear: "", category: "", members: [] });
 }
@@ -42,7 +42,7 @@ function SuccessContent() {
 
   const teamId   = params.get("teamId")    || "SIH-2026-001";
   const teamName = params.get("teamName")  || "Your Team";
-  const ideaTitle = params.get("ideaTitle") || "Your Idea";
+  const ideaTitle = params.get("ideaTitle") || undefined;
 
   const [hasRedirected, setHasRedirected] = useState(false);
 
@@ -296,13 +296,14 @@ function SuccessContent() {
           <div class="ic-val">Pending IQAC</div>
         </div>
       </div>
+      ${ideaTitle ? `
       <div class="idea">
         <div class="idea-stripe"></div>
         <div class="idea-body">
           <div class="idea-lbl">IDEA TITLE</div>
           <div class="idea-val">${ideaTitle}</div>
         </div>
-      </div>
+      </div>` : ''}
     </div>
 
     <!-- What Happens Next / Motivation -->
@@ -517,10 +518,20 @@ function SuccessContent() {
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Team Name</p>
               <p className="font-bold text-navy-primary text-base">{teamName}</p>
             </div>
-            <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Idea Title</p>
-              <p className="font-bold text-navy-primary text-base line-clamp-2">{ideaTitle}</p>
-            </div>
+            {ideaTitle ? (
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Idea Title</p>
+                <p className="font-bold text-navy-primary text-base line-clamp-2">{ideaTitle}</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Review Status</p>
+                <p className="font-bold text-emerald-600 text-base flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Pending IQAC Review
+                </p>
+              </div>
+            )}
           </motion.div>
 
           {/* ── NEXT STEPS & MOTIVATION ── */}

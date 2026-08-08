@@ -218,8 +218,8 @@ export function generateAcknowledgementPDF(
   twoCol("Team Name", registration.teamName || "", "Department", registration.department || "");
   twoCol("Academic Year", registration.academicYear || "", "Category", registration.category || "");
 
-  // Idea title — full width highlighted box
-  if (y + 14 <= maxY) {
+  // Idea title — full width highlighted box (only if provided)
+  if (registration.ideaTitle && y + 14 <= maxY) {
     doc.setFillColor(...slate50);
     doc.setDrawColor(...slate100);
     doc.setLineWidth(0.3);
@@ -237,7 +237,7 @@ export function generateAcknowledgementPDF(
     doc.setTextColor(...ink);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text((registration.ideaTitle || "—").substring(0, 60), m + 6, y + 10.5);
+    doc.text(registration.ideaTitle.substring(0, 60), m + 6, y + 10.5);
     y += 17;
   }
 

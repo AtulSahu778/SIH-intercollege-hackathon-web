@@ -25,11 +25,10 @@ export interface RegistrationFormData {
   // Section 2 — Team Details (leader + 5 members)
   members: TeamMember[];
 
-  // Section 3 — Project Details
-  problemStatement: string;
-  ideaTitle: string;
-  ideaDescription: string;
-
+  // Optional Project Details (Legacy support)
+  problemStatement?: string;
+  ideaTitle?: string;
+  ideaDescription?: string;
 }
 
 export interface RegistrationRecord {
@@ -39,10 +38,10 @@ export interface RegistrationRecord {
   department: string;
   academicYear: string;
   category: string;
-  problemStatement: string;
-  ideaTitle: string;
-  ideaDescription: string;
-  presentationUrl: string;
+  problemStatement?: string;
+  ideaTitle?: string;
+  ideaDescription?: string;
+  presentationUrl?: string;
   status: RegistrationStatus;
   members: TeamMember[];
 }
@@ -60,9 +59,9 @@ export interface RegistrationSubmitPayload {
   department: string;
   academicYear: string;
   category: string;
-  problemStatement: string;
-  ideaTitle: string;
-  ideaDescription: string;
+  problemStatement?: string;
+  ideaTitle?: string;
+  ideaDescription?: string;
   members: TeamMember[];
   pdfBase64: string;
   pdfFileName: string;

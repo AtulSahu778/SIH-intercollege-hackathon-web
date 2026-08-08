@@ -34,21 +34,10 @@ export const registrationSchema = z
       .array(memberSchema)
       .length(VALIDATION.TEAM_SIZE, `Exactly ${VALIDATION.TEAM_SIZE} members required`),
 
-    // Section 3
-    problemStatement: z
-      .string()
-      .min(10, "Problem statement is required (min 10 characters)"),
-    ideaTitle: z
-      .string()
-      .min(5, "Idea title must be at least 5 characters")
-      .max(120, "Idea title is too long"),
-    ideaDescription: z
-      .string()
-      .min(20, "Description must be at least 20 characters")
-      .refine(
-        (val) => val.trim().split(/\s+/).length <= VALIDATION.MAX_DESCRIPTION_WORDS,
-        `Description must not exceed ${VALIDATION.MAX_DESCRIPTION_WORDS} words`
-      ),
+    // Optional Project Details
+    problemStatement: z.string().optional(),
+    ideaTitle: z.string().optional(),
+    ideaDescription: z.string().optional(),
   })
   // ── Refinements ──────────────────────────────────────────────────────────
   .refine(

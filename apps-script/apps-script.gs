@@ -132,16 +132,16 @@ function registerTeam(data) {
 
   // ── Save to Registrations sheet immediately ────────────────────────────────
   regSheet.appendRow([
-    timestamp,                   // A: Timestamp
-    teamId,                      // B: Team ID
-    data.teamName,               // C: Team Name
-    data.department,             // D: Department
-    data.academicYear,           // E: Academic Year
-    data.category,               // F: Category
-    data.problemStatement,       // G: Problem Statement
-    data.ideaTitle,              // H: Idea Title
-    data.ideaDescription,        // I: Idea Description
-    "Pending",                   // J: Status
+    timestamp,                        // A: Timestamp
+    teamId,                           // B: Team ID
+    data.teamName,                    // C: Team Name
+    data.department,                  // D: Department
+    data.academicYear,                // E: Academic Year
+    data.category,                    // F: Category
+    data.problemStatement || "",      // G: Problem Statement
+    data.ideaTitle || "",             // H: Idea Title
+    data.ideaDescription || "",       // I: Idea Description
+    "Pending",                        // J: Status
   ]);
 
   // ── Save Team Members immediately ─────────────────────────────────────────

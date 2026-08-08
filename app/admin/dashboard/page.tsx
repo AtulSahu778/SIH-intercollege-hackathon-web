@@ -458,29 +458,39 @@ export default function AdminDashboard() {
                   ))}
                 </div>
 
-                {/* Project */}
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                  <p className="text-xs text-text-muted font-medium mb-1">Problem Statement</p>
-                  <p className="text-sm font-medium text-text-primary">{selectedReg.problemStatement}</p>
-                  <p className="text-xs text-text-muted font-medium mt-3 mb-1">Idea Title</p>
-                  <p className="text-sm font-bold text-text-primary">{selectedReg.ideaTitle}</p>
-                  {selectedReg.ideaDescription && (
-                    <>
-                      <p className="text-xs text-text-muted font-medium mt-3 mb-1">Description</p>
-                      <p className="text-xs text-text-muted leading-relaxed">{selectedReg.ideaDescription}</p>
-                    </>
-                  )}
-                  {selectedReg.presentationUrl && (
-                    <a
-                      href={selectedReg.presentationUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 mt-3 text-xs text-accent-orange font-semibold hover:underline"
-                    >
-                      View Presentation PDF →
-                    </a>
-                  )}
-                </div>
+                {/* Project (if available) */}
+                {(selectedReg.ideaTitle || selectedReg.problemStatement || selectedReg.presentationUrl) && (
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                    {selectedReg.problemStatement && (
+                      <>
+                        <p className="text-xs text-text-muted font-medium mb-1">Problem Statement</p>
+                        <p className="text-sm font-medium text-text-primary">{selectedReg.problemStatement}</p>
+                      </>
+                    )}
+                    {selectedReg.ideaTitle && (
+                      <>
+                        <p className="text-xs text-text-muted font-medium mt-3 mb-1">Idea Title</p>
+                        <p className="text-sm font-bold text-text-primary">{selectedReg.ideaTitle}</p>
+                      </>
+                    )}
+                    {selectedReg.ideaDescription && (
+                      <>
+                        <p className="text-xs text-text-muted font-medium mt-3 mb-1">Description</p>
+                        <p className="text-xs text-text-muted leading-relaxed">{selectedReg.ideaDescription}</p>
+                      </>
+                    )}
+                    {selectedReg.presentationUrl && (
+                      <a
+                        href={selectedReg.presentationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 mt-3 text-xs text-accent-orange font-semibold hover:underline"
+                      >
+                        View Presentation PDF →
+                      </a>
+                    )}
+                  </div>
+                )}
 
                 {/* Members */}
                 {selectedReg.members?.length > 0 && (

@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
   Loader2, Send,
-  Users, FolderOpen, Lightbulb, CheckCircle2, ChevronRight, ArrowLeft
+  Users, FolderOpen, CheckCircle2, ChevronRight, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 import RegistrationNotice from "@/components/registration/RegistrationNotice";
 import Section1TeamInfo from "@/components/registration/Section1TeamInfo";
 import Section2TeamDetails from "@/components/registration/Section2TeamDetails";
-import Section3ProjectDetails from "@/components/registration/Section3ProjectDetails";
 
 
 import {
@@ -43,14 +42,6 @@ const SECTIONS = [
     title: "Team Details",
     description: "Leader + 5 member information",
     icon: Users,
-    color: "text-navy-primary",
-    bgColor: "bg-navy-primary/10",
-  },
-  {
-    id: 3,
-    title: "Project Details",
-    description: "Idea title and description",
-    icon: Lightbulb,
     color: "text-navy-primary",
     bgColor: "bg-navy-primary/10",
   },
@@ -135,11 +126,10 @@ export default function RegistrationForm() {
     let fieldsToValidate: string[] = [];
     if (currentStep === 1) fieldsToValidate = ["teamName", "department", "academicYear", "category"];
     else if (currentStep === 2) fieldsToValidate = ["members"];
-    else if (currentStep === 3) fieldsToValidate = ["problemStatement", "ideaTitle", "ideaDescription"];
 
     const isStepValid = await trigger(fieldsToValidate as (keyof RegistrationSchemaType)[]);
     if (isStepValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, 3));
+      setCurrentStep((prev) => Math.min(prev + 1, 2));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -162,9 +152,9 @@ export default function RegistrationForm() {
         department: data.department,
         academicYear: data.academicYear,
         category: data.category,
-        problemStatement: data.problemStatement,
-        ideaTitle: data.ideaTitle,
-        ideaDescription: data.ideaDescription,
+        problemStatement: data.problemStatement || "",
+        ideaTitle: data.ideaTitle || "",
+        ideaDescription: data.ideaDescription || "",
         members: data.members,
         pdfBase64: "",
         pdfFileName: "",
@@ -179,7 +169,7 @@ export default function RegistrationForm() {
         // Clear draft
         localStorage.removeItem(AUTOSAVE_KEY);
         // Navigate to success page
-        router.push(`/register/success?teamId=${result.teamId}&teamName=${encodeURIComponent(data.teamName)}&ideaTitle=${encodeURIComponent(data.ideaTitle)}`);
+        router.push(`/register/success?teamId=${result.teamId}&teamName=${encodeURIComponent(data.teamName)}`);
       } else {
         toast.dismiss(toastId);
         toast.error("Submission failed", {
@@ -215,7 +205,7 @@ export default function RegistrationForm() {
               const Icon = section.icon;
 
               return (
-                <div key={section.id} className="relative z-10 flex flex-col items-center w-1/3">
+                <div key={section.id} className="relative z-10 flex flex-col items-center w-1/2">
                   <div className={cn(
                     "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2",
                     isActive ? "bg-navy-primary border-navy-primary text-white shadow-md scale-110" : 
@@ -298,7 +288,6 @@ export default function RegistrationForm() {
                 >
                   {currentStep === 1 && <Section1TeamInfo />}
                   {currentStep === 2 && <Section2TeamDetails />}
-                  {currentStep === 3 && <Section3ProjectDetails />}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -313,7 +302,7 @@ export default function RegistrationForm() {
               </Button>
             ) : <div />}
 
-            {currentStep < 3 ? (
+            {currentStep < 2 ? (
               <Button type="button" size="lg" onClick={nextStep} className="w-2/3 sm:w-auto sm:min-w-[160px] rounded-xl bg-navy-primary hover:bg-navy-secondary text-white shadow-lg shadow-navy-primary/20">
                 Next Step
                 <ChevronRight className="w-4 h-4 ml-2" />

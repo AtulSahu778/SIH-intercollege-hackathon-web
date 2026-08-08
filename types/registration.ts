@@ -30,8 +30,6 @@ export interface RegistrationFormData {
   ideaTitle: string;
   ideaDescription: string;
 
-  // Section 4 — Upload
-  presentationFile: File | null;
 }
 
 export interface RegistrationRecord {
@@ -68,6 +66,8 @@ export interface RegistrationSubmitPayload {
   members: TeamMember[];
   pdfBase64: string;
   pdfFileName: string;
+  authLetterBase64: string;
+  authLetterFileName: string;
 }
 
 export interface DashboardStats {

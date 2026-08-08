@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
   Loader2, Send,
-  Users, FolderOpen, Lightbulb, Upload, CheckCircle2, ChevronRight, ArrowLeft
+  Users, FolderOpen, Lightbulb, CheckCircle2, ChevronRight, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,13 +17,13 @@ import RegistrationNotice from "@/components/registration/RegistrationNotice";
 import Section1TeamInfo from "@/components/registration/Section1TeamInfo";
 import Section2TeamDetails from "@/components/registration/Section2TeamDetails";
 import Section3ProjectDetails from "@/components/registration/Section3ProjectDetails";
-import Section4Upload from "@/components/registration/Section4Upload";
+
 
 import {
   registrationSchema,
   RegistrationSchemaType,
 } from "@/lib/validation/registrationSchema";
-import { submitRegistration, fileToBase64 } from "@/lib/api/appsScript";
+import { submitRegistration } from "@/lib/api/appsScript";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -51,14 +51,6 @@ const SECTIONS = [
     title: "Project Details",
     description: "Idea title and description",
     icon: Lightbulb,
-    color: "text-navy-primary",
-    bgColor: "bg-navy-primary/10",
-  },
-  {
-    id: 4,
-    title: "Upload Presentation",
-    description: "Idea presentation PDF (max 10 MB)",
-    icon: Upload,
     color: "text-navy-primary",
     bgColor: "bg-navy-primary/10",
   },
@@ -100,7 +92,6 @@ export default function RegistrationForm() {
       problemStatement: "",
       ideaTitle: "",
       ideaDescription: "",
-      presentationFile: null,
     },
   });
 
@@ -113,7 +104,7 @@ export default function RegistrationForm() {
       try {
         const parsed = JSON.parse(saved);
         // Don't restore the file (can't serialize File objects)
-        reset({ ...parsed, presentationFile: null });
+        reset(parsed);
         toast.info("Draft restored", {
           description: "We restored your previously saved progress.",
           action: {
@@ -134,9 +125,7 @@ export default function RegistrationForm() {
   const formValues = watch();
   useEffect(() => {
     const timer = setTimeout(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { presentationFile: _, ...saveable } = formValues;
-      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(saveable));
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(formValues));
     }, 800);
     return () => clearTimeout(timer);
   }, [formValues]);
@@ -150,7 +139,7 @@ export default function RegistrationForm() {
 
     const isStepValid = await trigger(fieldsToValidate as (keyof RegistrationSchemaType)[]);
     if (isStepValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, 4));
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -162,20 +151,12 @@ export default function RegistrationForm() {
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const onSubmit = async (data: RegistrationSchemaType) => {
-    if (!data.presentationFile) {
-      toast.error("Please upload your idea presentation PDF before submitting.");
-      return;
-    }
-
     setIsSubmitting(true);
     const toastId = toast.loading("Submitting registration...", {
-      description: "Uploading presentation and saving team details. Please wait...",
+      description: "Saving your team details. Please wait...",
     });
 
     try {
-      // Convert file to base64
-      const pdfBase64 = await fileToBase64(data.presentationFile);
-
       const payload = {
         teamName: data.teamName,
         department: data.department,
@@ -185,8 +166,10 @@ export default function RegistrationForm() {
         ideaTitle: data.ideaTitle,
         ideaDescription: data.ideaDescription,
         members: data.members,
-        pdfBase64,
-        pdfFileName: data.presentationFile.name,
+        pdfBase64: "",
+        pdfFileName: "",
+        authLetterBase64: "",
+        authLetterFileName: "",
       };
 
       const result = await submitRegistration(payload);
@@ -232,7 +215,7 @@ export default function RegistrationForm() {
               const Icon = section.icon;
 
               return (
-                <div key={section.id} className="relative z-10 flex flex-col items-center w-1/4">
+                <div key={section.id} className="relative z-10 flex flex-col items-center w-1/3">
                   <div className={cn(
                     "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2",
                     isActive ? "bg-navy-primary border-navy-primary text-white shadow-md scale-110" : 
@@ -269,7 +252,17 @@ export default function RegistrationForm() {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate aria-label="Team registration form">
+        <form
+          onSubmit={handleSubmit(onSubmit, onError)}
+          noValidate
+          aria-label="Team registration form"
+          onKeyDown={(e) => {
+            // Prevent accidental form submission when pressing Enter inside inputs/textareas
+            if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
+              e.preventDefault();
+            }
+          }}
+        >
           
           <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden mb-8">
             <div className="px-5 py-6 sm:p-8">
@@ -306,7 +299,6 @@ export default function RegistrationForm() {
                   {currentStep === 1 && <Section1TeamInfo />}
                   {currentStep === 2 && <Section2TeamDetails />}
                   {currentStep === 3 && <Section3ProjectDetails />}
-                  {currentStep === 4 && <Section4Upload />}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -321,7 +313,7 @@ export default function RegistrationForm() {
               </Button>
             ) : <div />}
 
-            {currentStep < 4 ? (
+            {currentStep < 3 ? (
               <Button type="button" size="lg" onClick={nextStep} className="w-2/3 sm:w-auto sm:min-w-[160px] rounded-xl bg-navy-primary hover:bg-navy-secondary text-white shadow-lg shadow-navy-primary/20">
                 Next Step
                 <ChevronRight className="w-4 h-4 ml-2" />

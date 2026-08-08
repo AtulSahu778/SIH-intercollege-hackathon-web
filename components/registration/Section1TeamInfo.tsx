@@ -42,6 +42,9 @@ export default function Section1TeamInfo() {
           error={!!errors.teamName}
           {...register("teamName")}
         />
+        <p className="text-[11px] text-text-muted mt-1">
+          Must be unique and <strong>must NOT contain</strong> college name (e.g., &quot;Xavier&quot; or &quot;SXC&quot;).
+        </p>
         <FieldError message={errors.teamName?.message} />
       </div>
 

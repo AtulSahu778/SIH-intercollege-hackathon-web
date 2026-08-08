@@ -174,6 +174,16 @@ export const TEMPLATE = {
   description: "Official presentation template prescribed for Smart India Hackathon. Teams MUST download and strictly follow this template format. Submissions in any other format will be disqualified.",
 };
 
+export const AUTH_LETTER = {
+  name: "College Authorization Letter",
+  filename: "College-Authorization-letter-SIH2026.docx",
+  downloadUrl: "/api/auth-letter",
+  format: "PDF",
+  maxSizeMB: 5,
+  maxSizeBytes: 5 * 1024 * 1024,
+  description: "Official authorization letter template. Fill in all 6 member details + up to 2 mentors. Must be signed by the Principal/Director on college letterhead and uploaded as a PDF.",
+};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Feature Cards

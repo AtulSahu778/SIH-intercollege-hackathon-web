@@ -20,12 +20,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIGURATION — Update these before deploying
 // ─────────────────────────────────────────────────────────────────────────────
-const DRIVE_FOLDER_ID = "1myhKtKh60lSuvsRSBuy7wkl6NJB1_0xm"; // ← Clean Folder ID
+const DRIVE_FOLDER_ID = "1myhKtKh60lSuvsRSBuy7wkl6NJB1_0xm"; // Presentations folder
+const AUTH_LETTER_FOLDER_ID = "1pUZTHNsHJ7-tX094c9QR12GH5vd6TDLr"; // Authorization Letters folder
 
 const SHEET_NAMES = {
   REGISTRATIONS: "Registrations",
   TEAM_MEMBERS: "Team Members",
   UPLOADS: "Uploads",
+  AUTH_LETTERS: "Auth Letters",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,10 +125,8 @@ function registerTeam(data) {
   // ── Generate Team ID ───────────────────────────────────────────────────────
   const teamId = generateTeamId();
 
-  // ── Validate PDF payload exists (upload happens asynchronously) ────────────
-  if (!data.pdfBase64 || !data.pdfFileName) {
-    return { success: false, error: "Idea presentation PDF is required" };
-  }
+  // NOTE: PDF/PPT submission is a separate phase after registration.
+  // The pdfBase64 / pdfFileName fields are optional here.
 
   const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
@@ -157,32 +157,63 @@ function registerTeam(data) {
   });
 
   // ── Queue PDF upload via PropertiesService + time-based trigger ───────────
-  // Store the PDF payload in script properties so the async trigger can read it.
-  try {
-    const props = PropertiesService.getScriptProperties();
-    const pendingKey = "pdf_pending_" + teamId;
-    props.setProperty(pendingKey, JSON.stringify({
-      teamId: teamId,
-      pdfBase64: data.pdfBase64,
-      pdfFileName: data.pdfFileName,
-      timestamp: timestamp,
-    }));
-
-    // Create a one-time trigger to fire in 1 minute
-    ScriptApp.newTrigger("processPendingPdfUploads")
-      .timeBased()
-      .after(60 * 1000) // 1 minute from now
-      .create();
-  } catch (triggerErr) {
-    // Trigger creation failed — attempt synchronous fallback upload
-    console.warn("Async trigger failed, attempting sync upload:", triggerErr);
+  // PDF upload is optional at registration — only queue if payload is present.
+  if (data.pdfBase64 && data.pdfFileName) {
     try {
-      const pdfUrl = uploadPDF(data.pdfBase64, data.pdfFileName, teamId);
-      const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
-      uploadsSheet.appendRow([teamId, pdfUrl, timestamp]);
-    } catch (uploadErr) {
-      // Log but don't fail — data is already saved
-      console.error("Sync PDF upload also failed:", uploadErr);
+      const props = PropertiesService.getScriptProperties();
+      const pendingKey = "pdf_pending_" + teamId;
+      props.setProperty(pendingKey, JSON.stringify({
+        teamId: teamId,
+        pdfBase64: data.pdfBase64,
+        pdfFileName: data.pdfFileName,
+        timestamp: timestamp,
+      }));
+
+      // Create a one-time trigger to fire in 1 minute
+      ScriptApp.newTrigger("processPendingPdfUploads")
+        .timeBased()
+        .after(60 * 1000) // 1 minute from now
+        .create();
+    } catch (triggerErr) {
+      // Trigger creation failed — attempt synchronous fallback upload
+      console.warn("Async trigger failed, attempting sync upload:", triggerErr);
+      try {
+        const pdfUrl = uploadPDF(data.pdfBase64, data.pdfFileName, teamId);
+        const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+        uploadsSheet.appendRow([teamId, pdfUrl, timestamp]);
+      } catch (uploadErr) {
+        // Log but don't fail — data is already saved
+        console.error("Sync PDF upload also failed:", uploadErr);
+      }
+    }
+  }
+
+  // ── Queue Auth Letter upload ──────────────────────────────────────────────
+  // Required — queue for async upload to the Auth Letters Drive folder.
+  if (data.authLetterBase64 && data.authLetterFileName) {
+    try {
+      const props = PropertiesService.getScriptProperties();
+      const letterKey = "auth_letter_pending_" + teamId;
+      props.setProperty(letterKey, JSON.stringify({
+        teamId: teamId,
+        base64: data.authLetterBase64,
+        fileName: data.authLetterFileName,
+        timestamp: timestamp,
+      }));
+
+      ScriptApp.newTrigger("processPendingAuthLetters")
+        .timeBased()
+        .after(60 * 1000)
+        .create();
+    } catch (triggerErr) {
+      console.warn("Auth letter trigger failed, attempting sync upload:", triggerErr);
+      try {
+        const letterUrl = uploadToFolder(data.authLetterBase64, data.authLetterFileName, teamId, AUTH_LETTER_FOLDER_ID);
+        const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
+        authSheet.appendRow([teamId, letterUrl, timestamp]);
+      } catch (uploadErr) {
+        console.error("Sync auth letter upload failed:", uploadErr);
+      }
     }
   }
 
@@ -190,8 +221,7 @@ function registerTeam(data) {
   return {
     success: true,
     teamId: teamId,
-    message: "Registration successful! Your presentation PDF is being processed and will be available shortly.",
-    pdfUrl: "",  // Will be filled once the async trigger runs
+    message: "Registration successful! Your team has been registered.",
   };
 }
 
@@ -239,6 +269,52 @@ function processPendingPdfUploads() {
   }
 
   console.log("processPendingPdfUploads: processed", processed, "job(s)");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ASYNC AUTH LETTER UPLOAD PROCESSOR
+// Called by the time-based trigger created in registerTeam().
+// Reads all pending auth letter jobs, uploads to the Auth Letters Drive folder,
+// and records the URL in the Auth Letters sheet.
+// ─────────────────────────────────────────────────────────────────────────────
+function processPendingAuthLetters() {
+  const props = PropertiesService.getScriptProperties();
+  const allProps = props.getProperties();
+  const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
+
+  let processed = 0;
+
+  for (const key in allProps) {
+    if (!key.startsWith("auth_letter_pending_")) continue;
+
+    try {
+      const job = JSON.parse(allProps[key]);
+      const letterUrl = uploadToFolder(job.base64, job.fileName, job.teamId, AUTH_LETTER_FOLDER_ID);
+
+      authSheet.appendRow([
+        job.teamId,    // A: Team ID
+        letterUrl,     // B: File URL
+        job.timestamp, // C: Submission Time
+      ]);
+
+      props.deleteProperty(key);
+      processed++;
+      console.log("Auth letter uploaded for team:", job.teamId, "->", letterUrl);
+    } catch (err) {
+      console.error("Failed to upload auth letter for key:", key, String(err));
+      // Leave the property so it can be retried on the next trigger run
+    }
+  }
+
+  // Clean up completed triggers
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const trigger of triggers) {
+    if (trigger.getHandlerFunction() === "processPendingAuthLetters") {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  }
+
+  console.log("processPendingAuthLetters: processed", processed, "job(s)");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -348,9 +424,26 @@ function uploadPDF(base64Data, fileName, teamId) {
 
   return file.getUrl();
 }
-
 // ─────────────────────────────────────────────────────────────────────────────
-// GENERATE TEAM ID
+// UPLOAD FILE TO DRIVE (generic — supports any folder)
+// ─────────────────────────────────────────────────────────────────────────────
+function uploadToFolder(base64Data, fileName, teamId, folderId) {
+  // Strip any full URL down to just the ID
+  if (folderId.includes("/folders/")) {
+    folderId = folderId.split("/folders/")[1].split("?")[0].split("/")[0];
+  }
+  const folder = DriveApp.getFolderById(folderId);
+
+  const decoded = Utilities.base64Decode(base64Data);
+  const blob = Utilities.newBlob(decoded, "application/pdf", `${teamId}_${fileName}`);
+
+  const file = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  return file.getUrl();
+}
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 function generateTeamId() {
   const sheet = getSheet(SHEET_NAMES.REGISTRATIONS);
@@ -389,6 +482,9 @@ function setupSheetHeaders(sheet, name) {
     ],
     [SHEET_NAMES.UPLOADS]: [
       "Team ID", "Presentation PDF URL", "Submission Time"
+    ],
+    [SHEET_NAMES.AUTH_LETTERS]: [
+      "Team ID", "Authorization Letter URL", "Submission Time"
     ],
   };
 

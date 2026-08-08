@@ -5,7 +5,8 @@ import {
 } from "@/components/ui/accordion";
 import {
   Users, ClipboardCheck, Star, BarChart3, HelpCircle,
-  BookOpen, CheckCircle2, AlertCircle, Download, FileText
+  BookOpen, CheckCircle2, AlertCircle, Download, FileText,
+  Calendar, ListChecks, Code2, Cpu
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -21,22 +22,46 @@ const SECTIONS = [
     iconBg: "bg-blue-50",
     title: "Team Eligibility",
     content: (
-      <ul className="space-y-3">
-        {[
-          "Only currently enrolled students of St. Xavier's College, Ranchi are eligible to participate.",
-          "Students from all academic departments and streams within SXC Ranchi (CS, IT, Science, Commerce, Arts, Vocational, PG) are welcome.",
-          "Each team must consist of exactly 6 members (1 Team Leader + 5 Members).",
-          "A minimum of 2 female members is mandatory in every team.",
-          "All 6 members must belong to St. Xavier's College, Ranchi. Inter-departmental teams within SXC are encouraged.",
-          "One student cannot be part of multiple teams.",
-          "Faculty advisors are not counted as team members.",
-        ].map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5 text-sm">
-            <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="space-y-5">
+        <ul className="space-y-3">
+          {[
+            "Only currently enrolled students of St. Xavier's College, Ranchi are eligible to participate.",
+            "Students from all academic departments and streams within SXC Ranchi (CS, IT, Science, Commerce, Arts, Vocational, PG) are welcome.",
+            "Each team must consist of exactly 6 members (1 Team Leader + 5 Members).",
+            "A minimum of 2 female members is mandatory in every team.",
+            "All 6 members must belong to St. Xavier's College, Ranchi. Inter-college teams are NOT allowed.",
+            "One student cannot be part of multiple teams.",
+            "Faculty advisors are not counted as team members.",
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-sm">
+              <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Edition-specific guidance */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <div className="flex items-center gap-2 mb-2">
+              <Code2 className="w-4 h-4 text-blue-600" />
+              <span className="font-bold text-blue-800 text-sm">Software Edition</span>
+            </div>
+            <p className="text-xs text-blue-700 leading-relaxed">
+              Strong programming skills required. Teams should be able to build a functional software prototype or demo.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-violet-50 border border-violet-100">
+            <div className="flex items-center gap-2 mb-2">
+              <Cpu className="w-4 h-4 text-violet-600" />
+              <span className="font-bold text-violet-800 text-sm">Hardware Edition</span>
+            </div>
+            <p className="text-xs text-violet-700 leading-relaxed">
+              Multidisciplinary teams encouraged — Mechanical, Electronics, Designers, and more. Hardware prototypes required.
+            </p>
+          </div>
+        </div>
+      </div>
     ),
   },
   {
@@ -55,13 +80,105 @@ const SECTIONS = [
         </div>
         <ul className="space-y-3">
           {[
-            "Mandatory Template Format: You MUST download and use ONLY the official SIH 2026 Idea Presentation PPT template (SIH2025-IDEA-Presentation-Format.pptx). No other custom format will be accepted.",
             "Only one registration is allowed per team. Duplicate entries will be disqualified.",
             "All information provided must be accurate. Misrepresentation will result in disqualification.",
-            "Upload your idea presentation following the official template as PDF or PPTX (max 10 MB).",
             "Registrations are accepted only through this online portal — offline/email submissions will not be considered.",
             "Ensure all 6 member email addresses and mobile numbers are unique and valid.",
             "Once submitted, changes to registration can only be made by contacting IQAC directly.",
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-sm">
+              <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Team Name Rules */}
+        <div className="p-4 rounded-xl bg-red-50 border border-red-100">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="w-4 h-4 text-red-500" />
+            <span className="font-bold text-red-800 text-sm">Team Name Rules</span>
+          </div>
+          <ul className="space-y-1.5">
+            {[
+              "Team name must be unique — no two teams can share the same name.",
+              "Team name must NOT contain the college name (e.g., \"Xavier\", \"SXC\") or any variation of it.",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-red-700">
+                <span className="mt-1 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "leader-checklist",
+    icon: ListChecks,
+    iconColor: "text-accent-orange",
+    iconBg: "bg-orange-50",
+    title: "Team Leader Submission Checklist",
+    content: (
+      <div className="space-y-4">
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 flex items-start gap-3">
+          <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-amber-800 font-medium">
+            Only the Team Leader fills and submits the registration. Make sure all items below are ready before submitting.
+          </p>
+        </div>
+        <ul className="space-y-3">
+          {[
+            { item: "Team name (unique, does not contain college name)", required: true },
+            { item: "Full details of all 6 members — name, gender, email, mobile", required: true },
+            { item: "Selected problem statement / innovation category", required: true },
+            { item: "Idea title & short description", required: true },
+            { item: "Authorization Letter — on college letterhead, listing all 6 members + up to 2 mentors, signed by the Principal/Director", required: true },
+            { item: "Idea Presentation (PDF) — must use the official SIH 2026 template", required: false },
+          ].map(({ item, required }, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-sm">
+              <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${required ? "text-success" : "text-slate-400"}`} />
+              <span>
+                {item}
+                {!required && <span className="ml-1.5 text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">Submitted separately</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-text-muted bg-slate-50 border border-slate-100 rounded-xl p-3 leading-relaxed">
+          📌 The <strong>Authorization Letter</strong> is mandatory for the grand finale. Prepare it on college letterhead and get it signed by the Principal before the event.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: "idea-submission",
+    icon: Calendar,
+    iconColor: "text-blue-500",
+    iconBg: "bg-blue-50",
+    title: "Idea Submission Guidelines",
+    content: (
+      <div className="space-y-4">
+        {/* Deadline callout */}
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-red-50 border border-red-200">
+          <div className="flex-shrink-0 text-center">
+            <div className="text-2xl font-black text-red-600">15</div>
+            <div className="text-[10px] font-bold text-red-500 uppercase">Sep 2026</div>
+          </div>
+          <div>
+            <p className="font-bold text-red-800 text-sm">Strict Submission Deadline</p>
+            <p className="text-xs text-red-600 mt-0.5">Idea submissions close on 15 September 2026. No extensions will be granted.</p>
+          </div>
+        </div>
+
+        <ul className="space-y-3">
+          {[
+            "Idea submission window opens August 2026.",
+            "Only 500 ideas are accepted per problem statement (PS). Once the limit is reached, the PS is closed — submit early!",
+            "Each team can submit ideas for a maximum of 2 problem statements.",
+            "Presentations must follow the official SIH 2026 template format (PDF/PPTX, max 10 MB).",
+            "PPT submission is a separate step after registration is complete.",
           ].map((item, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm">
               <CheckCircle2 className="w-4 h-4 text-success mt-0.5 flex-shrink-0" />
@@ -263,7 +380,7 @@ export default function GuidelinesPage() {
           </div>
         </div>
 
-        <Accordion type="multiple" defaultValue={["eligibility", "registration-rules"]} className="space-y-3">
+        <Accordion type="multiple" defaultValue={["eligibility", "registration-rules", "leader-checklist", "idea-submission"]} className="space-y-3">
           {SECTIONS.map((section) => {
             const Icon = section.icon;
             return (

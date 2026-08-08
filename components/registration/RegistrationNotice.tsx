@@ -1,8 +1,8 @@
 "use client";
 
-import { Info, Users, UserCheck, AlertCircle, Laptop, FileText, Download } from "lucide-react";
+import { Info, Users, UserCheck, AlertCircle, Laptop } from "lucide-react";
 import { motion } from "framer-motion";
-import { VALIDATION, TEMPLATE, WHATSAPP_GROUP_URL } from "@/lib/constants";
+import { VALIDATION, WHATSAPP_GROUP_URL } from "@/lib/constants";
 
 function WhatsAppIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -39,12 +39,6 @@ export default function RegistrationNotice() {
       bg: "bg-violet-50",
     },
     {
-      icon: FileText,
-      text: "MUST use the official SIH PPT presentation template. Custom formats rejected.",
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
-    {
       icon: Info,
       text: "Only one registration per team. Duplicate entries will be disqualified.",
       color: "text-success",
@@ -78,25 +72,15 @@ export default function RegistrationNotice() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              href={WHATSAPP_GROUP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#128C7E] text-xs font-bold transition-colors duration-200"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] fill-current" />
-              <span>Join WhatsApp Group</span>
-            </a>
-            <a
-              href={TEMPLATE.downloadUrl}
-              download={TEMPLATE.filename}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-orange/10 hover:bg-accent-orange/20 border border-accent-orange/30 text-accent-orange text-xs font-semibold transition-colors duration-200"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download PPT Template</span>
-            </a>
-          </div>
+          <a
+            href={WHATSAPP_GROUP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#128C7E] text-xs font-bold transition-colors duration-200"
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] fill-current" />
+            <span>Join WhatsApp Group</span>
+          </a>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

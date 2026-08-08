@@ -49,9 +49,6 @@ export const registrationSchema = z
         (val) => val.trim().split(/\s+/).length <= VALIDATION.MAX_DESCRIPTION_WORDS,
         `Description must not exceed ${VALIDATION.MAX_DESCRIPTION_WORDS} words`
       ),
-
-    // Section 4
-    presentationFile: z.instanceof(File, { message: "PDF presentation is required" }).nullable(),
   })
   // ── Refinements ──────────────────────────────────────────────────────────
   .refine(
@@ -84,34 +81,6 @@ export const registrationSchema = z
       path: ["members"],
     }
   )
-  .refine(
-    (data) => {
-      if (!data.presentationFile) return false;
-      return data.presentationFile.size <= VALIDATION.MAX_PDF_SIZE_BYTES;
-    },
-    {
-      message: `PDF file must not exceed ${VALIDATION.MAX_PDF_SIZE_MB}MB`,
-      path: ["presentationFile"],
-    }
-  )
-  .refine(
-    (data) => {
-      if (!data.presentationFile) return true;
-      const fileName = data.presentationFile.name.toLowerCase();
-      const mimeType = data.presentationFile.type;
-      return (
-        mimeType === "application/pdf" ||
-        mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-        mimeType === "application/vnd.ms-powerpoint" ||
-        fileName.endsWith(".pdf") ||
-        fileName.endsWith(".pptx") ||
-        fileName.endsWith(".ppt")
-      );
-    },
-    {
-      message: "Please upload your presentation as a PDF or PPTX file using the official template",
-      path: ["presentationFile"],
-    }
-  );
+;
 
 export type RegistrationSchemaType = z.infer<typeof registrationSchema>;

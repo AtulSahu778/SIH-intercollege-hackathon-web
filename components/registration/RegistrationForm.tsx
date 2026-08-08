@@ -76,7 +76,7 @@ export default function RegistrationForm() {
     mode: "onTouched",
     defaultValues: {
       teamName: "",
-      department: "",
+      department: [],
       academicYear: "",
       category: undefined,
       members: defaultMembers,
@@ -147,9 +147,13 @@ export default function RegistrationForm() {
     });
 
     try {
+      const deptStr = Array.isArray(data.department)
+        ? data.department.join(", ")
+        : data.department || "";
+
       const payload = {
         teamName: data.teamName,
-        department: data.department,
+        department: deptStr,
         academicYear: data.academicYear,
         category: data.category,
         problemStatement: data.problemStatement || "",

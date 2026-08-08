@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue
 } from "@/components/ui/select";
-import { AlertCircle, Users, Layers, BookOpen, Tag } from "lucide-react";
+import { AlertCircle, Users, Layers, BookOpen, Tag, CheckCircle2 } from "lucide-react";
 import { DEPARTMENT_GROUPS, ACADEMIC_YEARS, CATEGORIES } from "@/lib/constants";
 import { RegistrationSchemaType } from "@/lib/validation/registrationSchema";
 
@@ -48,38 +48,97 @@ export default function Section1TeamInfo() {
         <FieldError message={errors.teamName?.message} />
       </div>
 
-      {/* Stream / Department */}
+      {/* Stream / Department (Multi-Select) */}
       <div>
-        <Label htmlFor="department" className="flex items-center gap-1.5 mb-1.5">
-          <BookOpen className="w-3.5 h-3.5 text-accent-orange" />
-          Department / Stream <span className="text-error">*</span>
-        </Label>
         <Controller
           name="department"
           control={control}
-          render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger
-                id="department"
-                error={!!errors.department}
-                aria-invalid={!!errors.department}
-              >
-                <SelectValue placeholder="Select your department" />
-              </SelectTrigger>
-              <SelectContent>
-                {DEPARTMENT_GROUPS.map((group) => (
-                  <SelectGroup key={group.category}>
-                    <SelectLabel>{group.category}</SelectLabel>
-                    {group.options.map((dept) => (
-                      <SelectItem key={dept} value={dept}>
-                        {dept}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          render={({ field }) => {
+            const selectedValues: string[] = Array.isArray(field.value)
+              ? field.value
+              : field.value
+              ? [field.value]
+              : [];
+
+            const toggleDept = (dept: string) => {
+              if (selectedValues.includes(dept)) {
+                field.onChange(selectedValues.filter((d) => d !== dept));
+              } else {
+                field.onChange([...selectedValues, dept]);
+              }
+            };
+
+            return (
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-accent-orange" />
+                    Department(s) / Stream(s) <span className="text-error">*</span>
+                  </Label>
+                  {selectedValues.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-navy-primary/10 text-navy-primary border border-navy-primary/20">
+                        {selectedValues.length} Selected
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => field.onChange([])}
+                        className="text-[11px] text-slate-400 hover:text-navy-primary font-medium transition-colors"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-text-muted">
+                  Select all departments represented by your team members (multi-selection enabled).
+                </p>
+
+                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 space-y-4 max-h-[360px] overflow-y-auto custom-scrollbar">
+                  {DEPARTMENT_GROUPS.map((group) => (
+                    <div key={group.category} className="space-y-2">
+                      <div className="text-[11px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-200/60 pb-1">
+                        {group.category}
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {group.options.map((dept) => {
+                          const isSelected = selectedValues.includes(dept);
+                          return (
+                            <button
+                              type="button"
+                              key={dept}
+                              onClick={() => toggleDept(dept)}
+                              className={`group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 border text-left ${
+                                isSelected
+                                  ? "bg-navy-primary text-white border-navy-primary shadow-sm scale-[1.02]"
+                                  : "bg-white text-slate-700 border-slate-200 hover:border-navy-primary/40 hover:bg-slate-50"
+                              }`}
+                            >
+                              <div
+                                className={`w-4 h-4 rounded-md flex items-center justify-center border transition-colors ${
+                                  isSelected
+                                    ? "bg-white text-navy-primary border-white"
+                                    : "border-slate-300 group-hover:border-navy-primary"
+                                }`}
+                              >
+                                {isSelected ? (
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-navy-primary stroke-[3]" />
+                                ) : (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-navy-primary transition-colors" />
+                                )}
+                              </div>
+                              <span>{dept}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }}
         />
         <FieldError message={errors.department?.message} />
       </div>

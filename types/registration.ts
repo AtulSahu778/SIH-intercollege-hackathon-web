@@ -18,7 +18,7 @@ export interface TeamMember {
 export interface RegistrationFormData {
   // Section 1 — Team Info
   teamName: string;
-  department: string;
+  department: string[] | string;
   academicYear: string;
   category: HackathonCategory;
 

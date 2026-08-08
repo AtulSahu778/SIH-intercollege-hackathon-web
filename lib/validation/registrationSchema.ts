@@ -23,7 +23,10 @@ export const registrationSchema = z
       .string()
       .min(3, "Team name must be at least 3 characters")
       .max(60, "Team name is too long"),
-    department: z.string().min(1, "Please select your stream"),
+    department: z.union([
+      z.array(z.string()).min(1, "Please select at least one department"),
+      z.string().min(1, "Please select at least one department")
+    ]),
     academicYear: z.string().min(1, "Please select academic year"),
     category: z.enum(["software", "hardware", "student_innovation"], {
       errorMap: () => ({ message: "Please select a hackathon category" }),

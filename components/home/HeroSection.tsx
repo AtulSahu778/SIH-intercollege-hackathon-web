@@ -130,10 +130,25 @@ export default function HeroSection() {
               ))}
             </motion.div>
 
+            {/* Urgent Banner */}
+            <motion.div
+              variants={itemVariants}
+              className="mt-10 mb-2 flex justify-center cursor-default"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-200">
+                <svg className="w-4 h-4 text-orange-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium tracking-wide">
+                  Hurry up! Registration closes soon.
+                </span>
+              </div>
+            </motion.div>
+
             {/* CTAs */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-10 w-full sm:w-auto"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-4 w-full sm:w-auto"
             >
               <Button
                 asChild

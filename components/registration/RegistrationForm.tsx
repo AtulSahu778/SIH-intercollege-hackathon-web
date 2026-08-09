@@ -23,6 +23,8 @@ import {
   RegistrationSchemaType,
 } from "@/lib/validation/registrationSchema";
 import { submitRegistration } from "@/lib/api/appsScript";
+import { useRegistrationOpen } from "@/lib/hooks/useRegistrationOpen";
+import { REGISTRATION_DEADLINE } from "@/lib/constants";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -70,6 +72,7 @@ export default function RegistrationForm() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isOpen = useRegistrationOpen();
 
   const methods = useForm<RegistrationSchemaType>({
     resolver: zodResolver(registrationSchema),
@@ -194,6 +197,32 @@ export default function RegistrationForm() {
   return (
     <FormProvider {...methods}>
       <div className="max-w-3xl mx-auto">
+
+        {/* Registration Closed Banner */}
+        {!isOpen && (
+          <div className="mb-8 rounded-2xl border-2 border-red-200 bg-red-50 p-8 text-center flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M5.07 5.07a10 10 0 1113.86 13.86A10 10 0 015.07 5.07z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-red-700 mb-1">Registration Closed</h2>
+              <p className="text-sm text-red-600/80 font-medium">
+                The deadline was{" "}
+                <span className="font-bold">
+                  {REGISTRATION_DEADLINE.toLocaleString("en-IN", {
+                    weekday: "long", day: "numeric", month: "long", year: "numeric",
+                    hour: "2-digit", minute: "2-digit", hour12: true,
+                    timeZone: "Asia/Kolkata",
+                  })}
+                </span>
+                . No further registrations are accepted.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Horizontal Stepper UI */}
         <div className="mb-10 px-2 sm:px-0">
           <div className="relative flex justify-between">

@@ -66,7 +66,8 @@ export default function Navbar() {
   return (
     <>
       <div className={cn(
-        "fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 print:hidden top-4 px-4 sm:px-6",
+        "fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 print:hidden px-4 sm:px-6",
+        scrolled ? "top-4" : "top-[76px] sm:top-[48px]",
         visible || isOpen
           ? "translate-y-0 opacity-100 pointer-events-auto"
           : "-translate-y-28 opacity-0 pointer-events-none"

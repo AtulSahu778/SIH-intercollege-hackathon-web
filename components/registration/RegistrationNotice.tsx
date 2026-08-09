@@ -83,6 +83,13 @@ export default function RegistrationNotice() {
           </a>
         </div>
 
+        <div className="mb-4 bg-red-50 border border-red-200 p-3 rounded-xl flex items-start gap-3 shadow-sm">
+          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5 animate-pulse" />
+          <span className="text-sm font-bold text-red-700">
+            Registration will close at Wednesday midnight (12 AM).
+          </span>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {rules.map((rule, i) => {
             const Icon = rule.icon;

@@ -234,9 +234,9 @@ export const FEATURES = [
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Registration Deadline
-// Wednesday night → 12:00 AM midnight (start of Thu, Aug 13, 2026) IST
+// Thursday night → 12:00 AM midnight (start of Fri, Aug 14, 2026) IST
 // ─────────────────────────────────────────────────────────────────────────────
-export const REGISTRATION_DEADLINE = new Date("2026-08-13T00:00:00+05:30");
+export const REGISTRATION_DEADLINE = new Date("2026-08-14T00:00:00+05:30");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin

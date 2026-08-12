@@ -79,7 +79,7 @@ export default function CountdownBanner() {
           <Timer className="w-4 h-4 flex-shrink-0 opacity-90" />
         )}
         <span className="text-sm font-medium">
-          Registration closes Wed, 12 Aug at midnight
+          Registration closes Thu, 13 Aug at midnight
         </span>
       </div>
 

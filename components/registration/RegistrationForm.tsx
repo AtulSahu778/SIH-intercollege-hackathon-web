@@ -223,8 +223,10 @@ export default function RegistrationForm() {
           </div>
         )}
 
-        {/* Horizontal Stepper UI */}
-        <div className="mb-10 px-2 sm:px-0">
+        {isOpen && (
+          <>
+            {/* Horizontal Stepper UI */}
+            <div className="mb-10 px-2 sm:px-0">
           <div className="relative flex justify-between">
             {SECTIONS.map((section, index) => {
               const isActive = currentStep === section.id;
@@ -356,6 +358,8 @@ export default function RegistrationForm() {
             )}
           </div>
         </form>
+        </>
+        )}
       </div>
     </FormProvider>
   );

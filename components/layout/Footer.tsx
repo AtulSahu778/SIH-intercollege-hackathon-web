@@ -131,15 +131,6 @@ export default function Footer() {
                   </div>
                 </a>
               </li>
-              <li className="flex items-start gap-3.5 text-sm text-white/70 group">
-                <div className="mt-0.5 p-2 rounded-lg bg-white/5 border border-white/10">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-orange"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                </div>
-                <div>
-                  <div className="font-medium text-white/90">Location</div>
-                  <div className="mt-0.5 leading-relaxed">{COLLEGE.address}</div>
-                </div>
-              </li>
             </ul>
           </div>
         </div>

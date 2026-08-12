@@ -86,7 +86,7 @@ export default function RegistrationNotice() {
         <div className="mb-4 bg-red-50 border border-red-200 p-3 rounded-xl flex items-start gap-3 shadow-sm">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5 animate-pulse" />
           <span className="text-sm font-bold text-red-700">
-            Registration will close at Wednesday midnight (12 AM).
+            Registration will close at Thursday midnight (12 AM).
           </span>
         </div>
 

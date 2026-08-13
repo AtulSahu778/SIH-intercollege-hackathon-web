@@ -186,13 +186,13 @@ export default function AdminDashboard() {
       {/* Top Bar */}
       <div className="bg-navy-primary border-b border-white/10 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden shadow-sm border border-white/20">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden shadow-sm border border-white/20 flex-shrink-0">
               <Image src={sxcLogo} alt="College Logo" className="w-full h-full object-contain" />
             </div>
-            <div>
-              <div className="text-white font-bold text-sm">Admin Dashboard</div>
-              <div className="text-white/40 text-xs hidden sm:block">{HACKATHON.shortName} · {COLLEGE.shortName}</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-white font-bold text-sm sm:text-sm truncate">Admin Dashboard</div>
+              <div className="text-white/40 text-[10px] sm:text-xs hidden sm:block truncate">{HACKATHON.shortName} · {COLLEGE.shortName}</div>
             </div>
           </div>
 
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatsCard title="Total Registrations" value={stats.total} icon={Users} color="text-navy-primary" bg="bg-blue-50" />
@@ -238,8 +238,8 @@ export default function AdminDashboard() {
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={deptData} margin={{ top: 0, right: 0, bottom: 20, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-25} textAnchor="end" />
-                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#64748b' }} angle={-35} textAnchor="end" height={50} interval={0} />
+                  <YAxis tick={{ fontSize: 10, fill: '#64748b' }} allowDecimals={false} width={30} />
                   <Tooltip
                     contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
                   />
@@ -276,9 +276,9 @@ export default function AdminDashboard() {
         {/* Category chart */}
         <div className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm overflow-hidden">
           <h2 className="font-bold text-text-primary mb-4 sm:mb-5">Category Distribution</h2>
-          <div className="flex overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 md:flex md:flex-wrap gap-3 sm:gap-6 snap-x hide-scrollbar">
+          <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 sm:pt-0 sm:overflow-visible sm:grid sm:grid-cols-3 md:flex md:flex-wrap gap-3 sm:gap-6 snap-x snap-mandatory hide-scrollbar">
             {categoryData.map((cat) => (
-              <div key={cat.name} className="flex-1 min-w-[140px] sm:min-w-0 snap-start text-center p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <div key={cat.name} className="flex-1 min-w-[130px] sm:min-w-0 snap-center text-center p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 shadow-sm sm:shadow-none">
                 <div className="text-xl sm:text-2xl font-black text-text-primary">{cat.count}</div>
                 <div className="text-[10px] sm:text-xs text-text-muted mt-1 leading-tight">{cat.name}</div>
               </div>
@@ -332,15 +332,15 @@ export default function AdminDashboard() {
             ) : (
               <>
                 {/* Mobile List View (visible only on small screens) */}
-                <div className="block sm:hidden divide-y divide-slate-100">
+                <div className="block md:hidden divide-y divide-slate-100">
                   {filtered.map((reg) => (
                     <div key={reg.teamId} className="p-4 flex flex-col gap-3 hover:bg-slate-50/50 active:bg-slate-50 transition-colors cursor-pointer" onClick={() => setSelectedReg(reg)}>
-                      <div className="flex justify-between items-start gap-2">
-                        <div>
-                          <h3 className="font-bold text-text-primary text-sm line-clamp-1">{reg.teamName}</h3>
-                          <p className="font-mono text-[10px] text-navy-primary font-bold mt-0.5">{reg.teamId}</p>
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <h3 className="font-bold text-text-primary text-sm truncate">{reg.teamName}</h3>
+                          <p className="font-mono text-[10px] text-navy-primary font-bold mt-0.5 truncate">{reg.teamId}</p>
                         </div>
-                        <Badge variant={statusBadgeVariant(reg.status as RegistrationStatus)} className="flex-shrink-0 text-[10px] px-2 py-0.5">
+                        <Badge variant={statusBadgeVariant(reg.status as RegistrationStatus)} className="flex-shrink-0 text-[10px] px-2 py-0.5 mt-0.5 self-start">
                           {reg.status}
                         </Badge>
                       </div>
@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Desktop Table View (hidden on small screens) */}
-                <div className="hidden sm:block overflow-x-auto">
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-sm" role="table" aria-label="Registrations table">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/80">
@@ -430,9 +430,9 @@ export default function AdminDashboard() {
             <>
               <DialogHeader className="p-4 sm:p-6 pb-4 sm:pb-5 sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-slate-100">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div>
-                    <DialogTitle>{selectedReg.teamName}</DialogTitle>
-                    <DialogDescription className="font-mono text-xs mt-0.5">
+                  <div className="flex-1 min-w-0">
+                    <DialogTitle className="truncate pr-8">{selectedReg.teamName}</DialogTitle>
+                    <DialogDescription className="font-mono text-[10px] sm:text-xs mt-0.5 truncate pr-8">
                       {selectedReg.teamId}
                     </DialogDescription>
                   </div>
@@ -442,51 +442,51 @@ export default function AdminDashboard() {
                 </div>
               </DialogHeader>
 
-              <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-5">
+              <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
                 {/* Meta */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-100">
                   {[
                     { label: "Department", value: selectedReg.department },
                     { label: "Academic Year", value: selectedReg.academicYear },
                     { label: "Category", value: selectedReg.category?.replace("_", " ") },
                     { label: "Submitted", value: selectedReg.timestamp },
                   ].map((item) => (
-                    <div key={item.label}>
-                      <p className="text-xs text-text-muted font-medium">{item.label}</p>
-                      <p className="font-semibold text-text-primary capitalize">{item.value || "—"}</p>
+                    <div key={item.label} className="flex flex-col gap-1">
+                      <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider">{item.label}</p>
+                      <p className="text-sm font-semibold text-text-primary capitalize leading-snug break-words">{item.value || "—"}</p>
                     </div>
                   ))}
                 </div>
 
                 {/* Project (if available) */}
                 {(selectedReg.ideaTitle || selectedReg.problemStatement || selectedReg.presentationUrl) && (
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex flex-col gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-100">
                     {selectedReg.problemStatement && (
-                      <>
-                        <p className="text-xs text-text-muted font-medium mb-1">Problem Statement</p>
-                        <p className="text-sm font-medium text-text-primary">{selectedReg.problemStatement}</p>
-                      </>
+                      <div>
+                        <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider mb-1.5">Problem Statement</p>
+                        <p className="text-sm font-medium text-text-primary leading-relaxed">{selectedReg.problemStatement}</p>
+                      </div>
                     )}
                     {selectedReg.ideaTitle && (
-                      <>
-                        <p className="text-xs text-text-muted font-medium mt-3 mb-1">Idea Title</p>
+                      <div>
+                        <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider mb-1.5">Idea Title</p>
                         <p className="text-sm font-bold text-text-primary">{selectedReg.ideaTitle}</p>
-                      </>
+                      </div>
                     )}
                     {selectedReg.ideaDescription && (
-                      <>
-                        <p className="text-xs text-text-muted font-medium mt-3 mb-1">Description</p>
-                        <p className="text-xs text-text-muted leading-relaxed">{selectedReg.ideaDescription}</p>
-                      </>
+                      <div>
+                        <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider mb-1.5">Description</p>
+                        <p className="text-sm text-text-muted leading-relaxed">{selectedReg.ideaDescription}</p>
+                      </div>
                     )}
                     {selectedReg.presentationUrl && (
                       <a
                         href={selectedReg.presentationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 mt-3 text-xs text-accent-orange font-semibold hover:underline"
+                        className="inline-flex items-center justify-center gap-2 mt-2 px-4 py-3 sm:py-2.5 rounded-xl bg-navy-primary text-white text-xs sm:text-sm font-bold hover:bg-navy-secondary transition-colors"
                       >
-                        View Presentation PDF →
+                        <Download className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> View Presentation PDF
                       </a>
                     )}
                   </div>
@@ -495,20 +495,35 @@ export default function AdminDashboard() {
                 {/* Members */}
                 {selectedReg.members?.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">Team Members</p>
-                    <div className="space-y-2">
+                    <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 px-1">Team Members</p>
+                    <div className="space-y-2.5">
                       {selectedReg.members.map((m, i) => (
-                        <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-sm">
+                        <div key={i} className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-100 hover:border-slate-200 transition-colors">
+                          
+                          {/* Dot Indicator */}
                           <div className={cn(
-                            "w-2 h-2 rounded-full flex-shrink-0",
-                            m.gender === "Female" ? "bg-accent-orange" : "bg-navy-primary/30"
+                            "w-2 h-2 rounded-full flex-shrink-0 shadow-sm mt-1.5",
+                            m.gender === "Female" ? "bg-accent-orange" : m.gender === "Male" ? "bg-navy-primary" : "bg-emerald-500"
                           )} />
-                          <span className="font-semibold text-text-primary flex-1 truncate">{m.fullName}</span>
-                          <span className="text-text-muted text-xs">{m.gender}</span>
-                          <span className="text-text-muted text-xs hidden sm:block truncate max-w-[150px]">{m.email}</span>
-                          {m.memberType === "Leader" && (
-                            <span className="px-2 py-0.5 rounded-full bg-orange-100 text-accent-orange text-xs font-semibold">Leader</span>
-                          )}
+                          
+                          {/* Member Info */}
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="font-bold text-text-primary text-sm truncate">{m.fullName}</span>
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 shadow-sm bg-white font-medium text-text-muted border-slate-200">
+                                  {m.gender}
+                                </Badge>
+                                {m.memberType === "Leader" && (
+                                  <span className="px-1.5 py-0.5 rounded-md bg-orange-100/80 border border-orange-200/50 text-accent-orange text-[9px] font-bold uppercase tracking-wider">
+                                    Leader
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="text-text-muted text-[11px] sm:text-xs truncate">{m.email}</span>
+                          </div>
+                          
                         </div>
                       ))}
                     </div>
@@ -516,11 +531,11 @@ export default function AdminDashboard() {
                 )}
 
                 {/* Status actions */}
-                <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-100">
+                <div className="flex flex-col sm:flex-row gap-2.5 pt-4 border-t border-slate-100">
                   {selectedReg.status !== "Approved" && (
                     <Button
                       variant="success"
-                      className="flex-1"
+                      className="flex-1 h-11 sm:h-10 text-sm font-semibold shadow-sm"
                       disabled={updatingId === selectedReg.teamId}
                       onClick={() => handleStatusUpdate(selectedReg.teamId, "Approved")}
                     >
@@ -530,7 +545,7 @@ export default function AdminDashboard() {
                   {selectedReg.status !== "Rejected" && (
                     <Button
                       variant="destructive"
-                      className="flex-1"
+                      className="flex-1 h-11 sm:h-10 text-sm font-semibold shadow-sm"
                       disabled={updatingId === selectedReg.teamId}
                       onClick={() => handleStatusUpdate(selectedReg.teamId, "Rejected")}
                     >
@@ -540,7 +555,7 @@ export default function AdminDashboard() {
                   {selectedReg.status !== "Pending" && (
                     <Button
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 h-11 sm:h-10 text-sm font-semibold"
                       disabled={updatingId === selectedReg.teamId}
                       onClick={() => handleStatusUpdate(selectedReg.teamId, "Pending")}
                     >

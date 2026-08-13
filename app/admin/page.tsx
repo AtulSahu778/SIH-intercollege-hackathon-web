@@ -55,20 +55,20 @@ export default function AdminLoginPage() {
       >
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-br from-navy-primary to-navy-secondary px-8 py-8 text-center">
-            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-white p-1.5 shadow-lg border border-white/20 overflow-hidden">
+          <div className="bg-gradient-to-br from-navy-primary to-navy-secondary px-6 sm:px-8 py-6 sm:py-8 text-center">
+            <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-white p-1.5 shadow-lg border border-white/20 overflow-hidden">
               <Image src={sxcLogo} alt="College Logo" className="w-full h-full object-contain" />
             </div>
-            <h1 className="text-xl font-black text-white mb-1">Admin Access</h1>
-            <p className="text-white/60 text-xs">{HACKATHON.name}</p>
-            <p className="text-white/40 text-xs mt-0.5">{COLLEGE.shortName}</p>
+            <h1 className="text-xl sm:text-2xl font-black text-white mb-1">Admin Access</h1>
+            <p className="text-white/60 text-xs sm:text-sm">{HACKATHON.name}</p>
+            <p className="text-white/40 text-[10px] sm:text-xs mt-0.5">{COLLEGE.shortName}</p>
           </div>
 
           {/* Form */}
-          <div className="px-8 py-8">
+          <div className="px-6 sm:px-8 py-6 sm:py-8">
             <div className="flex items-center gap-2 mb-6 text-text-muted">
-              <Lock className="w-4 h-4" />
-              <span className="text-sm">Enter your admin password to continue</span>
+              <Lock className="w-4 h-4 flex-shrink-0" />
+              <span className="text-xs sm:text-sm">Enter your admin password to continue</span>
             </div>
 
             <form onSubmit={handleLogin} noValidate>

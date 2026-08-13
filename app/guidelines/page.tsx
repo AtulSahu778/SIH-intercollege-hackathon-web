@@ -134,7 +134,7 @@ const SECTIONS = [
             { item: "Full details of all 6 members — name, gender, email, mobile", required: true },
             { item: "Selected problem statement / innovation category", required: true },
             { item: "Idea title & short description", required: true },
-            { item: "Authorization Letter — on college letterhead, listing all 6 members + up to 2 mentors", required: false },
+            { item: "Authorization Letter — listing leader and member names (administrative processing handled by management)", required: false },
             { item: "Idea Presentation (PDF) — must use the official SIH 2026 template", required: false },
           ].map(({ item, required }, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm">
@@ -147,7 +147,7 @@ const SECTIONS = [
           ))}
         </ul>
         <p className="text-xs text-text-muted bg-slate-50 border border-slate-100 rounded-xl p-3 leading-relaxed">
-          📌 The <strong>Authorization Letter</strong> is mandatory for the grand finale. Prepare it on college letterhead.
+          📌 For the <strong>Authorization Letter</strong>, teams only need to fill in their leader and member names. College letterhead, Principal&apos;s signature, and official seal will be completed by college management.
         </p>
       </div>
     ),
@@ -411,10 +411,10 @@ export default function GuidelinesPage() {
               {COLLEGE.shortName} at SIH 2026.
             </p>
             <a
-              href="/register"
+              href="/authletterupload"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white font-semibold text-sm shadow-lg hover:bg-orange-500 transition-colors duration-200"
             >
-              Register Your Team →
+              Upload Authorization Letter →
             </a>
           </div>
         </div>

@@ -16,7 +16,7 @@ import sxcLogo from "@/app/images/sxclogo.jpg";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/guidelines", label: "Guidelines" },
-  { href: "/register", label: "Register", highlight: true },
+  { href: "/authletterupload", label: "Upload Auth Letter", highlight: true },
 ];
 
 export default function Navbar() {
@@ -66,8 +66,7 @@ export default function Navbar() {
   return (
     <>
       <div className={cn(
-        "fixed left-0 right-0 z-50 flex justify-center transition-all duration-500 print:hidden px-4 sm:px-6",
-        scrolled ? "top-4" : "top-[76px] sm:top-[48px]",
+        "fixed top-3 sm:top-4 left-0 right-0 z-50 flex justify-center transition-all duration-500 print:hidden px-4 sm:px-6",
         visible || isOpen
           ? "translate-y-0 opacity-100 pointer-events-auto"
           : "-translate-y-28 opacity-0 pointer-events-none"

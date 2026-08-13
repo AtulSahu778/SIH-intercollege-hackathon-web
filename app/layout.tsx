@@ -4,7 +4,6 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import CountdownBanner from "@/components/layout/CountdownBanner";
 import { COLLEGE, HACKATHON } from "@/lib/constants";
 
 const inter = Inter({
@@ -87,7 +86,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased bg-background text-text-primary">
-        <CountdownBanner />
         <Navbar />
         <main>{children}</main>
         <Footer />

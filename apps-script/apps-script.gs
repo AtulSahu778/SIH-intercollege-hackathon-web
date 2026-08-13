@@ -43,25 +43,41 @@ function corsResponse(data) {
 // ─────────────────────────────────────────────────────────────────────────────
 function doGet(e) {
   try {
-    const action = e.parameter?.action || "getRegistrations";
+    const action = (e && e.parameter && e.parameter.action) || "getRegistrations";
 
     if (action === "getRegistrations") {
       return corsResponse(getRegistrations());
     }
 
-    return corsResponse({ success: false, error: "Unknown action" });
+    if (action === "verifyTeamId") {
+      const teamId = e && e.parameter && e.parameter.teamId;
+      if (!teamId) return corsResponse({ success: false, error: "teamId parameter is required" });
+      return corsResponse(verifyTeamId(teamId));
+    }
+
+    return corsResponse({ success: false, error: "Unknown action: " + action });
   } catch (err) {
     return corsResponse({ success: false, error: String(err) });
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST Handler — Routes by action field in body
+// POST Handler — Routes by action field in body or query param
 // ─────────────────────────────────────────────────────────────────────────────
 function doPost(e) {
   try {
-    const body = JSON.parse(e.postData.contents);
-    const action = body.action;
+    let body = {};
+    if (e && e.postData && e.postData.contents) {
+      try {
+        body = JSON.parse(e.postData.contents);
+      } catch (parseErr) {
+        body = (e && e.parameter) || {};
+      }
+    } else if (e && e.parameter) {
+      body = e.parameter;
+    }
+
+    const action = body.action || (e && e.parameter && e.parameter.action);
 
     if (action === "register") {
       return corsResponse(registerTeam(body));
@@ -69,6 +85,14 @@ function doPost(e) {
 
     if (action === "updateStatus") {
       return corsResponse(updateStatus(body.teamId, body.status));
+    }
+
+    if (action === "verifyTeamId") {
+      return corsResponse(verifyTeamId(body.teamId || (e && e.parameter && e.parameter.teamId)));
+    }
+
+    if (action === "uploadAuthLetter") {
+      return corsResponse(uploadAuthLetterForTeam(body));
     }
 
     return corsResponse({ success: false, error: "Unknown action: " + action });
@@ -402,6 +426,102 @@ function updateStatus(teamId, status) {
   }
 
   return { success: false, error: `Team ID ${teamId} not found` };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VERIFY TEAM ID
+// Returns whether a teamId exists in the Registrations sheet, and checks if
+// they have already uploaded an authorization letter (blocking duplicate uploads).
+// ─────────────────────────────────────────────────────────────────────────────
+function verifyTeamId(teamId) {
+  if (!teamId) return { success: false, error: "teamId is required" };
+
+  try {
+    const normId = String(teamId).trim().toUpperCase();
+
+    // 1. Check in Registrations sheet
+    const regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
+    const regData = regSheet.getDataRange().getValues();
+    let teamName = null;
+
+    for (let i = 1; i < regData.length; i++) {
+      if (String(regData[i][1]).trim().toUpperCase() === normId) {
+        teamName = regData[i][2] || "Registered Team";
+        break;
+      }
+    }
+
+    if (!teamName) {
+      return { success: false, exists: false, error: "Team ID not found. Please verify your SIH Team ID." };
+    }
+
+    // 2. Check in Auth Letters sheet
+    const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
+    const authData = authSheet.getDataRange().getValues();
+
+    for (let j = 1; j < authData.length; j++) {
+      if (String(authData[j][0]).trim().toUpperCase() === normId) {
+        return {
+          success: false,
+          exists: true,
+          alreadySubmitted: true,
+          teamName: teamName,
+          error: "Team " + teamName + " (" + normId + ") has already submitted an authorization letter. Multiple uploads are not allowed.",
+        };
+      }
+    }
+
+    return { success: true, exists: true, alreadySubmitted: false, teamName: teamName };
+  } catch (err) {
+    return { success: false, error: "Error verifying team: " + String(err) };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UPLOAD AUTH LETTER (post-registration upload)
+// One-time only — strictly blocks duplicate submissions.
+// ─────────────────────────────────────────────────────────────────────────────
+function uploadAuthLetterForTeam(data) {
+  const { teamId, base64, fileName } = data;
+
+  if (!teamId || !base64 || !fileName) {
+    return { success: false, error: "teamId, base64, and fileName are required." };
+  }
+
+  const normId = String(teamId).trim().toUpperCase();
+
+  // Verify team exists & check duplicate
+  const verify = verifyTeamId(normId);
+  if (!verify.exists) {
+    return { success: false, error: verify.error || "Team not found." };
+  }
+  if (verify.alreadySubmitted) {
+    return { success: false, alreadySubmitted: true, error: "Your team has already submitted an authorization letter. Re-upload is not permitted." };
+  }
+
+  // Double-check Auth Letters sheet directly
+  const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
+  const existingData = authSheet.getDataRange().getValues();
+  for (let i = 1; i < existingData.length; i++) {
+    if (String(existingData[i][0]).trim().toUpperCase() === normId) {
+      return { success: false, alreadySubmitted: true, error: "Your team has already submitted an authorization letter. Re-upload is not permitted." };
+    }
+  }
+
+  // Upload to Drive
+  const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  try {
+    const letterUrl = uploadToFolder(base64, fileName, normId, AUTH_LETTER_FOLDER_ID);
+    authSheet.appendRow([normId, letterUrl, timestamp]);
+    return {
+      success: true,
+      message: "Authorization letter submitted successfully.",
+      url: letterUrl,
+    };
+  } catch (err) {
+    console.error("uploadAuthLetterForTeam error:", String(err));
+    return { success: false, error: "Failed to upload file. Please try again." };
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

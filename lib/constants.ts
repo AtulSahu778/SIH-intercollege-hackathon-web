@@ -180,7 +180,7 @@ export const AUTH_LETTER = {
   format: "PDF",
   maxSizeMB: 5,
   maxSizeBytes: 5 * 1024 * 1024,
-  description: "Official authorization letter template. Fill in all 6 member details + up to 2 mentors. Must be signed by the Principal/Director on college letterhead and uploaded as a PDF.",
+  description: "Official authorization letter template. Teams only need to fill in their Team Leader and member names. Official college letterhead, principal signatures, and administrative endorsements will be handled directly by college management.",
 };
 
 

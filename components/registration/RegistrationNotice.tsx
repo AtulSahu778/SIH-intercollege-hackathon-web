@@ -84,7 +84,7 @@ export default function RegistrationNotice() {
         </div>
 
         <div className="mb-4 bg-red-50 border border-red-200 p-3 rounded-xl flex items-start gap-3 shadow-sm">
-          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5 animate-pulse" />
+          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
           <span className="text-sm font-bold text-red-700">
             Registration will close at Thursday midnight (12 AM).
           </span>
@@ -94,18 +94,15 @@ export default function RegistrationNotice() {
           {rules.map((rule, i) => {
             const Icon = rule.icon;
             return (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + i * 0.07 }}
                 className={`flex items-start gap-3 p-3 rounded-xl ${rule.bg}`}
               >
                 <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${rule.color}`} />
                 <span className="text-xs text-text-primary font-medium leading-relaxed">
                   {rule.text}
                 </span>
-              </motion.div>
+              </div>
             );
           })}
         </div>

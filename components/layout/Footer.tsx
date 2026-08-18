@@ -46,8 +46,7 @@ export default function Footer() {
             <div className="mt-8 flex items-center gap-3">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-medium text-white/80 shadow-inner">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                  <span className="inline-flex rounded-full h-2 w-2 bg-success"></span>
                 </span>
                 Registrations Open
               </span>
@@ -66,10 +65,10 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/70 hover:text-white transition-all duration-300 flex items-center gap-2 group"
+                    className="text-sm text-white/70 hover:text-white transition-colors duration-200 flex items-center gap-2"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-orange/40 group-hover:bg-accent-orange group-hover:scale-125 transition-all duration-300" />
-                    <span className="group-hover:translate-x-1 transition-transform duration-300">{link.label}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent-orange/40" />
+                    <span>{link.label}</span>
                   </Link>
                 </li>
               ))}
@@ -78,12 +77,12 @@ export default function Footer() {
                   href={COLLEGE.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-white/70 hover:text-accent-cyan transition-all duration-300 flex items-center gap-2 group"
+                  className="text-sm text-white/70 hover:text-accent-cyan transition-colors duration-200 flex items-center gap-2"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan/40 group-hover:bg-accent-cyan group-hover:scale-125 transition-all duration-300" />
-                  <span className="group-hover:translate-x-1 transition-transform duration-300 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan/40" />
+                  <span className="flex items-center gap-1.5">
                     College Website
-                    <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+                    <ExternalLink className="w-3 h-3 opacity-50" />
                   </span>
                 </a>
               </li>

@@ -411,25 +411,25 @@ function SuccessContent() {
             <div className="absolute inset-0 bg-gradient-to-t from-navy-primary via-transparent to-transparent" />
             
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className="relative flex items-center justify-center w-24 h-24 mx-auto mb-6"
             >
-              <div className="absolute inset-0 bg-success/20 rounded-full blur-xl animate-pulse duration-2000" />
+              <div className="absolute inset-0 bg-success/20 rounded-full blur-xl" />
               <div className="w-20 h-20 bg-success rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)] border-4 border-success/30 relative z-10">
                 <CheckCircle2 className="w-10 h-10 text-white" strokeWidth={2.5} />
               </div>
             </motion.div>
             
             <motion.h1 
-              initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
               className="relative z-10 text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight"
             >
               Registration Successful!
             </motion.h1>
             <motion.p 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
               className="relative z-10 text-white/70 text-sm sm:text-base leading-relaxed max-w-md mx-auto"
             >
               Your team has been successfully registered for the{" "}
@@ -439,11 +439,11 @@ function SuccessContent() {
 
           {/* ── WHATSAPP GROUP AUTO-JOIN CARD ── */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            className="mx-6 sm:mx-10 mt-6 p-6 rounded-3xl bg-gradient-to-br from-[#25D366] via-[#128C7E] to-[#075E54] text-white shadow-2xl shadow-[#25D366]/25 border border-white/20 relative overflow-hidden group"
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
+            className="mx-6 sm:mx-10 mt-6 p-6 rounded-3xl bg-gradient-to-br from-[#25D366] via-[#128C7E] to-[#075E54] text-white shadow-2xl shadow-[#25D366]/25 border border-white/20 relative overflow-hidden"
           >
             {/* Background Glow Orbs */}
-            <div className="absolute -right-12 -top-12 w-40 h-40 bg-white/20 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
+            <div className="absolute -right-12 -top-12 w-40 h-40 bg-white/20 rounded-full blur-2xl pointer-events-none" />
             <div className="absolute -left-12 -bottom-12 w-32 h-32 bg-[#25D366]/30 rounded-full blur-xl pointer-events-none" />
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 relative z-10">
@@ -470,18 +470,18 @@ function SuccessContent() {
                 href={WHATSAPP_GROUP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-white text-[#075E54] hover:bg-emerald-50 font-black text-sm shadow-xl hover:shadow-2xl transition-all duration-300 shrink-0 transform hover:-translate-y-0.5 active:scale-95 group/btn border border-white"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-white text-[#075E54] hover:bg-emerald-50 font-black text-sm shadow-xl transition-colors duration-200 shrink-0 active:scale-95 border border-white"
               >
-                <WhatsAppIcon className="w-5 h-5 text-[#25D366] fill-current group-hover/btn:scale-110 transition-transform" />
+                <WhatsAppIcon className="w-5 h-5 text-[#25D366] fill-current" />
                 <span>Join Group Now</span>
-                <ExternalLink className="w-4 h-4 text-[#075E54]/70 group-hover/btn:translate-x-0.5 transition-transform" />
+                <ExternalLink className="w-4 h-4 text-[#075E54]/70" />
               </a>
             </div>
           </motion.div>
 
           {/* ── TICKET ID ── */}
           <motion.div 
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
             className="px-6 sm:px-10 py-8 border-b border-slate-100 bg-slate-50/50"
           >
             <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] text-center mb-4">
@@ -511,7 +511,7 @@ function SuccessContent() {
 
           {/* ── INFO ── */}
           <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
             className="px-6 sm:px-10 py-6 border-b border-slate-100 grid grid-cols-2 gap-6"
           >
             <div>
@@ -527,7 +527,7 @@ function SuccessContent() {
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Review Status</p>
                 <p className="font-bold text-emerald-600 text-base flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   Pending IQAC Review
                 </p>
               </div>

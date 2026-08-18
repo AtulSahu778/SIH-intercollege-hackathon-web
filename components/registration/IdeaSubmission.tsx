@@ -210,10 +210,10 @@ export default function IdeaSubmission() {
             {step === "verify" && (
               <motion.div
                 key="verify"
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.25 }}
               >
                 <div className="text-center mb-6">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-navy-primary/5 text-navy-primary mb-3">
@@ -263,14 +263,14 @@ export default function IdeaSubmission() {
                     type="button"
                     onClick={handleVerify}
                     disabled={isVerifying || !teamIdInput.trim()}
-                    className="w-full h-11 sm:h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-semibold text-sm shadow-md shadow-navy-primary/10 disabled:opacity-50 transition-all duration-200 group"
+                    className="w-full h-11 sm:h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-semibold text-sm shadow-md shadow-navy-primary/10 disabled:opacity-50 transition-all duration-200"
                   >
                     {isVerifying ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <span className="flex items-center gap-2">
                         Verify &amp; Continue
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        <ArrowRight className="w-4 h-4" />
                       </span>
                     )}
                   </Button>
@@ -282,10 +282,10 @@ export default function IdeaSubmission() {
             {step === "idea" && verified && (
               <motion.div
                 key="idea"
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.25 }}
               >
                 {/* Header */}
                 <div className="flex flex-col mb-8 pb-6 border-b border-slate-100 gap-4">
@@ -339,7 +339,7 @@ export default function IdeaSubmission() {
                         if (formErrors.problemStatement) setFormErrors((fe) => ({ ...fe, problemStatement: undefined }));
                       }}
                       className={cn(
-                        "w-full px-4 py-3.5 rounded-2xl bg-slate-50/50 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100/50 transition-all duration-300 text-sm outline-none placeholder:text-slate-400",
+                        "w-full px-4 py-3.5 rounded-2xl bg-slate-50/50 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100/50 transition-all duration-200 text-sm outline-none placeholder:text-slate-400",
                         formErrors.problemStatement && "border-red-200 focus:border-red-300 focus:ring-red-50 bg-red-50/30"
                       )}
                     />
@@ -364,7 +364,7 @@ export default function IdeaSubmission() {
                         if (formErrors.ideaTitle) setFormErrors((fe) => ({ ...fe, ideaTitle: undefined }));
                       }}
                       className={cn(
-                        "w-full px-4 py-3.5 rounded-2xl bg-slate-50/50 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100/50 transition-all duration-300 text-sm outline-none placeholder:text-slate-400",
+                        "w-full px-4 py-3.5 rounded-2xl bg-slate-50/50 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100/50 transition-all duration-200 text-sm outline-none placeholder:text-slate-400",
                         formErrors.ideaTitle && "border-red-200 focus:border-red-300 focus:ring-red-50 bg-red-50/30"
                       )}
                     />
@@ -392,7 +392,7 @@ export default function IdeaSubmission() {
                         if (formErrors.ideaDescription) setFormErrors((fe) => ({ ...fe, ideaDescription: undefined }));
                       }}
                       className={cn(
-                        "w-full px-4 py-3.5 rounded-2xl bg-slate-50/50 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100/50 transition-all duration-300 text-sm outline-none resize-none leading-relaxed placeholder:text-slate-400",
+                        "w-full px-4 py-3.5 rounded-2xl bg-slate-50/50 border border-transparent focus:bg-white focus:border-slate-200 focus:ring-4 focus:ring-slate-100/50 transition-all duration-200 text-sm outline-none resize-none leading-relaxed placeholder:text-slate-400",
                         formErrors.ideaDescription && "border-red-200 focus:border-red-300 focus:ring-red-50 bg-red-50/30"
                       )}
                     />
@@ -405,7 +405,7 @@ export default function IdeaSubmission() {
                       type="button"
                       onClick={handleSubmit}
                       disabled={isSubmitting}
-                      className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm shadow-xl shadow-slate-900/10 disabled:opacity-50 transition-all duration-300 group"
+                      className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm shadow-xl shadow-slate-900/10 disabled:opacity-50 transition-all duration-200"
                     >
                       {isSubmitting ? (
                         <span className="flex items-center gap-2">
@@ -415,7 +415,7 @@ export default function IdeaSubmission() {
                       ) : (
                         <span className="flex items-center gap-2">
                           Submit Project Idea
-                          <Send className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                          <Send className="w-4 h-4" />
                         </span>
                       )}
                     </Button>
@@ -429,13 +429,12 @@ export default function IdeaSubmission() {
             {step === "done" && verified && (
               <motion.div
                 key="done"
-                initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
                 className="text-center py-6 sm:py-10"
               >
                 <div className="relative w-20 h-20 mx-auto mb-6">
-                  <div className="absolute inset-0 bg-emerald-100 rounded-full animate-ping opacity-20" />
                   <div className="relative w-full h-full bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 shadow-sm">
                     <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                   </div>

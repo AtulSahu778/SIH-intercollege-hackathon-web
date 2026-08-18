@@ -154,29 +154,11 @@ export default function Navbar() {
               aria-controls="mobile-menu"
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              <AnimatePresence mode="wait" initial={false}>
-                {isOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, scale: 0.75, opacity: 0 }}
-                    animate={{ rotate: 0, scale: 1, opacity: 1 }}
-                    exit={{ rotate: 90, scale: 0.75, opacity: 0 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                  >
-                    <X className="w-5 h-5 stroke-[2]" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="open"
-                    initial={{ rotate: 90, scale: 0.75, opacity: 0 }}
-                    animate={{ rotate: 0, scale: 1, opacity: 1 }}
-                    exit={{ rotate: -90, scale: 0.75, opacity: 0 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                  >
-                    <Menu className="w-5 h-5 stroke-[2]" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {isOpen ? (
+                <X className="w-5 h-5 stroke-[2]" />
+              ) : (
+                <Menu className="w-5 h-5 stroke-[2]" />
+              )}
             </button>
           </div>
         </div>
@@ -192,7 +174,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
               className="fixed inset-0 z-40 bg-navy-primary/40 backdrop-blur-md md:hidden"
               onClick={() => setIsOpen(false)}
             />
@@ -200,24 +182,19 @@ export default function Navbar() {
             <motion.div
               ref={menuRef}
               id="mobile-menu"
-              initial={{ opacity: 0, y: -16, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -16, scale: 0.96 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="fixed top-24 left-4 right-4 z-50 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden md:hidden"
             >
               <nav className="p-4 space-y-1.5" aria-label="Mobile navigation">
-                {NAV_LINKS.map((link, index) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
+                {NAV_LINKS.map((link) => (
+                  <div key={link.href}>
                     <Link
                       href={link.href}
                       className={cn(
-                        "flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 touch-target",
+                        "flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-semibold transition-colors duration-200 touch-target",
                         link.highlight
                           ? "bg-accent-orange text-white shadow-lg shadow-orange-500/25 active:bg-orange-600"
                           : pathname === link.href
@@ -228,7 +205,7 @@ export default function Navbar() {
                       <span>{link.label}</span>
                       <ChevronRight className={cn("w-4 h-4 opacity-70", link.highlight && "opacity-100")} />
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
                 <div className="pt-2.5 border-t border-slate-100 mt-2.5">
                   <Link

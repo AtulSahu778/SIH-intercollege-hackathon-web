@@ -63,24 +63,8 @@ const config: Config = {
       },
       keyframes: {
         "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-up": {
-          "0%": { opacity: "0", transform: "translateY(30px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-12px)" },
-        },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(255, 122, 26, 0)" },
-          "50%": { boxShadow: "0 0 20px 8px rgba(255, 122, 26, 0.25)" },
-        },
-        "shimmer": {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
         },
         "accordion-down": {
           from: { height: "0" },
@@ -90,21 +74,11 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "check-in": {
-          "0%": { transform: "scale(0) rotate(-45deg)", opacity: "0" },
-          "80%": { transform: "scale(1.2) rotate(0deg)", opacity: "1" },
-          "100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
-        },
       },
       animation: {
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "slide-up": "slide-up 0.6s ease-out forwards",
-        "float": "float 4s ease-in-out infinite",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "shimmer": "shimmer 2s linear infinite",
+        "fade-in": "fade-in 0.3s ease-out forwards",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "check-in": "check-in 0.4s ease-out forwards",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

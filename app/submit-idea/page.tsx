@@ -18,7 +18,7 @@ export default function SubmitIdeaPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 sm:pt-36 sm:pb-14">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] sm:text-xs font-semibold text-white/90 mb-3 sm:mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-orange" />
               Idea Submission · iSIH 2026
             </div>
             <h1 className="text-xl sm:text-3xl md:text-4xl font-black text-white leading-tight">

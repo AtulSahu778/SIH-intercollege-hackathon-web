@@ -64,16 +64,16 @@ type EligibilityItemType = (typeof ELIGIBILITY_ITEMS)[number];
 // level — not inside a .map() callback, which violates the Rules of Hooks.
 function EligibilityItem({ item, index }: { item: EligibilityItemType; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-40px" });
+  const isInView = useInView(ref, { once: true, margin: "-30px" });
   const Icon = item.icon;
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: 20 }}
-      animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] as const }}
-      className={`flex items-start gap-4 p-4 rounded-2xl border ${item.bgColor} ${item.borderColor} group hover:shadow-sm transition-shadow duration-200`}
+      initial={{ opacity: 0, y: 8 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.35, delay: index * 0.05, ease: "easeOut" }}
+      className={`flex items-start gap-4 p-4 rounded-2xl border ${item.bgColor} ${item.borderColor} hover:shadow-sm transition-shadow duration-200`}
       role="listitem"
     >
       {/* Icon */}
@@ -99,7 +99,7 @@ function EligibilityItem({ item, index }: { item: EligibilityItemType; index: nu
 
 export default function EligibilitySection() {
   const headerRef = useRef<HTMLDivElement>(null);
-  const isHeaderInView = useInView(headerRef, { once: true, margin: "-80px" });
+  const isHeaderInView = useInView(headerRef, { once: true, margin: "-50px" });
 
   return (
     <section className="py-16 lg:py-28 bg-white" aria-labelledby="eligibility-heading">
@@ -109,9 +109,9 @@ export default function EligibilitySection() {
           {/* Left — Header */}
           <motion.div
             ref={headerRef}
-            initial={{ opacity: 0, x: -30 }}
-            animate={isHeaderInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.35, ease: "easeOut" }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 border border-orange-100 text-xs font-semibold text-accent-orange mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-orange" />

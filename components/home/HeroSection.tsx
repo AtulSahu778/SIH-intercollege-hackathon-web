@@ -1,29 +1,28 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { Lightbulb, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import pmBanner from "@/app/images/sih2025-slider-banner-PM-Banner2.png";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
+      staggerChildren: 0.08,
     },
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 8 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.35, ease: "easeOut" as const },
   },
 };
 
@@ -40,8 +39,8 @@ export default function HeroSection() {
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
 
       {/* Gradient orbs */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-accent-orange/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-accent-cyan/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-accent-orange/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-accent-cyan/10 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-navy-secondary/30 rounded-full blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 lg:py-32 w-full">
@@ -56,16 +55,16 @@ export default function HeroSection() {
           >
             {/* PM Banner */}
             <motion.div variants={itemVariants} className="w-full max-w-6xl mx-auto mb-8 sm:mb-10 px-2 sm:px-4">
-              <div className="rounded-xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-navy-secondary/50 relative group bg-black/10">
-                <Image priority src={pmBanner} alt="Smart India Hackathon PM Banner" className="w-full h-auto object-contain transform group-hover:scale-105 transition-transform duration-700" />
+              <div className="rounded-xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-navy-secondary/50 relative bg-black/10">
+                <Image priority src={pmBanner} alt="Smart India Hackathon PM Banner" className="w-full h-auto object-contain" />
               </div>
             </motion.div>
 
             {/* Top badge */}
             <motion.div variants={itemVariants} className="flex flex-col items-center justify-center mb-8 px-2">
-              <div className="group relative inline-flex items-center justify-center">
+              <div className="relative inline-flex items-center justify-center">
                 {/* Subtle ambient border glow */}
-                <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-orange/40 via-accent-cyan/40 to-accent-orange/40 rounded-full blur-sm opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-300" />
+                <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-orange/40 via-accent-cyan/40 to-accent-orange/40 rounded-full blur-sm opacity-50" />
                 
                 {/* Main Badge */}
                 <div className="relative flex flex-col sm:flex-row items-center gap-1.5 sm:gap-4 px-5 sm:px-6 py-2 sm:py-2.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-full shadow-2xl">
@@ -139,10 +138,10 @@ export default function HeroSection() {
               <Button
                 asChild
                 size="xl"
-                className="w-full sm:w-auto bg-gradient-to-r from-accent-orange via-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-98 transition-all duration-300 group border border-orange-400/30"
+                className="w-full sm:w-auto bg-gradient-to-r from-accent-orange via-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-98 transition-all duration-200 border border-orange-400/30"
               >
                 <Link href="/submit-idea" className="flex items-center justify-center gap-2.5">
-                  <Lightbulb className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                  <Lightbulb className="w-5 h-5" />
                   <span>Submit Your Idea</span>
                 </Link>
               </Button>
@@ -150,10 +149,10 @@ export default function HeroSection() {
               <Button
                 asChild
                 size="xl"
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 backdrop-blur-xl text-white font-semibold rounded-2xl shadow-lg shadow-navy-primary/40 hover:shadow-cyan-500/10 active:scale-98 transition-all duration-300 group"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 backdrop-blur-xl text-white font-semibold rounded-2xl shadow-lg shadow-navy-primary/40 hover:shadow-cyan-500/10 active:scale-98 transition-all duration-200"
               >
                 <Link href="/guidelines" className="flex items-center justify-center gap-2.5">
-                  <ScrollText className="w-5 h-5 text-accent-cyan transition-transform group-hover:scale-110" />
+                  <ScrollText className="w-5 h-5 text-accent-cyan" />
                   <span>View Guidelines</span>
                 </Link>
               </Button>

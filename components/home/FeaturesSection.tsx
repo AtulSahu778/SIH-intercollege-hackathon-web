@@ -30,24 +30,24 @@ interface FeatureCardProps {
 function FeatureCard({ title, description, icon, color, iconColor, index }: FeatureCardProps) {
   const Icon = ICONS[icon] ?? Lightbulb;
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const isInView = useInView(ref, { once: true, margin: "-30px" });
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] as const }}
-      className="group relative bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+      transition={{ duration: 0.35, delay: index * 0.05, ease: "easeOut" }}
+      className="group relative bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
       role="article"
     >
       {/* Background gradient on hover */}
-      <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300", color)} />
+      <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-200", color)} />
 
       {/* Content */}
       <div className="relative">
         <div className={cn(
-          "w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300",
+          "w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center mb-4 shadow-sm",
           color
         )}>
           <Icon className={cn("w-6 h-6", iconColor)} />
@@ -74,9 +74,9 @@ export default function FeaturesSection() {
         {/* Section Header */}
         <motion.div
           ref={headerRef}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
           className="text-center max-w-4xl mx-auto mb-14 flex flex-col items-center"
         >
           {/* MoE / AICTE Header Banner */}

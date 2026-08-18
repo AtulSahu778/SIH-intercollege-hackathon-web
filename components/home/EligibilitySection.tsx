@@ -129,8 +129,8 @@ export default function EligibilitySection() {
             {/* CTA */}
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Button asChild size="lg">
-                <Link href="/authletterupload">
-                  Upload Authorization Letter <ArrowRight className="w-4 h-4" />
+                <Link href="/submit-idea">
+                  Submit Your Idea <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">

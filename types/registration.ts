@@ -44,6 +44,7 @@ export interface RegistrationRecord {
   presentationUrl?: string;
   status: RegistrationStatus;
   members: TeamMember[];
+  ideaSubmittedAt?: string;
 }
 
 export interface ApiResponse<T = unknown> {

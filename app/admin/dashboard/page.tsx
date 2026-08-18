@@ -2,16 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import sxcLogo from "@/app/images/sxclogo.jpg";
+
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
-} from "recharts";
-import {
-  Users, Clock, CheckCircle2, XCircle, RefreshCw, Download,
-  Search, Eye, LogOut
+  Users, Clock, RefreshCw, Download,
+  Search, LogOut, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,61 +17,21 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { getRegistrations, updateRegistrationStatus } from "@/lib/api/appsScript";
-import { RegistrationRecord, RegistrationStatus } from "@/types/registration";
+import { getRegistrations } from "@/lib/api/appsScript";
+import { RegistrationRecord } from "@/types/registration";
 import { ADMIN_SESSION_KEY, COLLEGE, HACKATHON, CATEGORIES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Colors
-// ─────────────────────────────────────────────────────────────────────────────
-const PIE_COLORS = { Male: "#0B2545", Female: "#FF7A1A", Other: "#06B6D4", "Prefer not to say": "#10B981" };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stats Card
-// ─────────────────────────────────────────────────────────────────────────────
-function StatsCard({
-  title, value, icon: Icon, color, bg
-}: {
-  title: string; value: number;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string; bg: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm"
-    >
-      <div className="flex items-center justify-between mb-3 gap-2">
-        <span className="text-xs sm:text-sm font-medium text-text-muted truncate">{title}</span>
-        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${bg} flex-shrink-0 flex items-center justify-center`}>
-          <Icon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${color}`} />
-        </div>
-      </div>
-      <div className="text-2xl sm:text-3xl font-black text-text-primary">{value}</div>
-    </motion.div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main Dashboard
-// ─────────────────────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const router = useRouter();
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("All");
   const [selectedReg, setSelectedReg] = useState<RegistrationRecord | null>(null);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  // Auth guard
   useEffect(() => {
     const session = sessionStorage.getItem(ADMIN_SESSION_KEY);
-    if (!session) {
-      router.push("/admin");
-    }
+    if (!session) router.push("/admin");
   }, [router]);
 
   const loadData = useCallback(async () => {
@@ -88,86 +45,26 @@ export default function AdminDashboard() {
     setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  // ── Stats ─────────────────────────────────────────────────────────────────
   const stats = {
     total: registrations.length,
-    pending: registrations.filter((r) => r.status === "Pending").length,
-    approved: registrations.filter((r) => r.status === "Approved").length,
-    rejected: registrations.filter((r) => r.status === "Rejected").length,
   };
 
-  // ── Charts ────────────────────────────────────────────────────────────────
-  const deptData = Object.entries(
-    registrations.reduce<Record<string, number>>((acc, r) => {
-      const dept = r.department?.split(" ").slice(0, 2).join(" ") || "Other";
-      acc[dept] = (acc[dept] || 0) + 1;
-      return acc;
-    }, {})
-  )
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 8);
-
-  const genderData = Object.entries(
-    registrations.flatMap((r) => r.members || []).reduce<Record<string, number>>((acc, m) => {
-      acc[m.gender] = (acc[m.gender] || 0) + 1;
-      return acc;
-    }, {})
-  ).map(([name, value]) => ({ name, value }));
-
-  const categoryData = CATEGORIES.map((cat) => ({
-    name: cat.label,
-    count: registrations.filter((r) => r.category === cat.value).length,
-  }));
-
-  // ── Filter ────────────────────────────────────────────────────────────────
   const filtered = registrations.filter((r) => {
-    const matchSearch =
-      !search ||
-      r.teamName?.toLowerCase().includes(search.toLowerCase()) ||
-      r.teamId?.toLowerCase().includes(search.toLowerCase()) ||
-      r.department?.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "All" || r.status === statusFilter;
-    return matchSearch && matchStatus;
+    return !search || r.teamName?.toLowerCase().includes(search.toLowerCase()) || r.teamId?.toLowerCase().includes(search.toLowerCase()) || r.department?.toLowerCase().includes(search.toLowerCase());
   });
 
-  // ── Status Update ─────────────────────────────────────────────────────────
-  const handleStatusUpdate = async (teamId: string, status: RegistrationStatus) => {
-    setUpdatingId(teamId);
-    const result = await updateRegistrationStatus(teamId, status);
-    if (result.success) {
-      setRegistrations((prev) =>
-        prev.map((r) => (r.teamId === teamId ? { ...r, status } : r))
-      );
-      toast.success(`Status updated to ${status}`);
-      if (selectedReg?.teamId === teamId) {
-        setSelectedReg((prev) => prev ? { ...prev, status } : null);
-      }
-    } else {
-      toast.error("Failed to update status", { description: result.error });
-    }
-    setUpdatingId(null);
-  };
-
-  // ── Export CSV ────────────────────────────────────────────────────────────
   const exportCSV = () => {
-    const headers = ["Team ID", "Team Name", "Department", "Academic Year", "Category", "Idea Title", "Status", "Timestamp"];
-    const rows = registrations.map((r) => [
-      r.teamId, r.teamName, r.department, r.academicYear, r.category,
-      r.ideaTitle, r.status, r.timestamp
-    ]);
-    const csv = [headers, ...rows].map((row) => row.map((v) => `"${v ?? ""}"`).join(",")).join("\n");
+    const headers = [ "Team ID", "Team Name", "Department", "Academic Year", "Category", "Problem Statement", "Idea Title", "Idea Description", "Idea Submitted At", "Registered At" ];
+    const rows = registrations.map((r) => [ r.teamId, r.teamName, r.department, r.academicYear, r.category, r.problemStatement || "", r.ideaTitle || "", r.ideaDescription || "", r.ideaSubmittedAt || "", r.timestamp ]);
+    const csv = [headers, ...rows].map((row) => row.map((v) => `"${(v ?? "").toString().replace(/"/g, '""')}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `SIH2026-Registrations-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
-    toast.success("CSV exported!");
   };
 
   const logout = () => {
@@ -175,395 +72,195 @@ export default function AdminDashboard() {
     router.push("/admin");
   };
 
-  const statusBadgeVariant = (status: RegistrationStatus) => {
-    if (status === "Approved") return "approved";
-    if (status === "Rejected") return "rejected";
-    return "pending";
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Bar */}
-      <div className="bg-navy-primary border-b border-white/10 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden shadow-sm border border-white/20 flex-shrink-0">
-              <Image src={sxcLogo} alt="College Logo" className="w-full h-full object-contain" />
+    <div className="min-h-screen bg-[#fafafa] font-sans selection:bg-slate-200 text-slate-900 pb-20">
+      
+      {/* ── Minimal Header ── */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div className="max-w-[1400px] mx-auto h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Image src={sxcLogo} alt="Logo" className="w-8 h-8 rounded border border-slate-200 object-contain p-0.5 bg-white" />
+            <div className="hidden sm:block">
+              <h1 className="font-semibold text-sm leading-tight">Admin Dashboard</h1>
+              <p className="text-[11px] text-slate-500 font-medium">{HACKATHON.shortName} • {COLLEGE.shortName}</p>
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-white font-bold text-sm sm:text-sm truncate">Admin Dashboard</div>
-              <div className="text-white/40 text-[10px] sm:text-xs hidden sm:block truncate">{HACKATHON.shortName} · {COLLEGE.shortName}</div>
+            <div className="block sm:hidden">
+              <h1 className="font-semibold text-sm leading-tight">Admin</h1>
             </div>
           </div>
-
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Button
-              variant="glass"
-              size="icon"
-              className="sm:w-auto sm:px-3 h-9 w-9"
-              onClick={loadData}
-              disabled={isLoading}
-              title="Refresh"
-            >
-              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
-              <span className="hidden sm:inline ml-2">Refresh</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Button variant="outline" size="sm" className="h-8 w-8 sm:w-auto px-0 sm:px-3 shadow-none border-slate-200 hover:bg-slate-50" onClick={loadData} disabled={isLoading} title="Sync">
+              <RefreshCw className={cn("w-4 h-4 sm:w-3.5 sm:h-3.5 sm:mr-2", isLoading && "animate-spin")} /> 
+              <span className="hidden sm:inline text-xs">Sync</span>
             </Button>
-            <Button variant="glass" size="icon" className="sm:w-auto sm:px-3 h-9 w-9" onClick={exportCSV} title="Export CSV">
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Export</span>
+            <Button variant="outline" size="sm" className="h-8 w-8 sm:w-auto px-0 sm:px-3 shadow-none border-slate-200 hover:bg-slate-50" onClick={exportCSV} title="Export CSV">
+              <Download className="w-4 h-4 sm:w-3.5 sm:h-3.5 sm:mr-2" /> 
+              <span className="hidden sm:inline text-xs">Export</span>
             </Button>
-            <Button variant="glass" size="icon" className="sm:w-auto sm:px-3 h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-500/10" onClick={logout} title="Logout">
+            <div className="w-px h-4 bg-slate-200 mx-1 sm:mx-2"></div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900 hover:bg-slate-100" onClick={logout} title="Logout">
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Logout</span>
             </Button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <StatsCard title="Total Registrations" value={stats.total} icon={Users} color="text-navy-primary" bg="bg-blue-50" />
-          <StatsCard title="Pending Review" value={stats.pending} icon={Clock} color="text-amber-500" bg="bg-amber-50" />
-          <StatsCard title="Approved" value={stats.approved} icon={CheckCircle2} color="text-success" bg="bg-emerald-50" />
-          <StatsCard title="Rejected" value={stats.rejected} icon={XCircle} color="text-error" bg="bg-red-50" />
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* ── Stats ── */}
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex items-center justify-between">
+          <div>
+            <div className="text-xs font-medium text-slate-500 mb-1 uppercase tracking-wider">Total Registrations</div>
+            <div className="text-4xl font-semibold text-slate-900">{stats.total}</div>
+          </div>
+          <Users className="w-12 h-12 text-slate-200" />
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Department chart */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-            <h2 className="font-bold text-text-primary mb-5">Department Distribution</h2>
-            {deptData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={deptData} margin={{ top: 0, right: 0, bottom: 20, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#64748b' }} angle={-35} textAnchor="end" height={50} interval={0} />
-                  <YAxis tick={{ fontSize: 10, fill: '#64748b' }} allowDecimals={false} width={30} />
-                  <Tooltip
-                    contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
-                  />
-                  <Bar dataKey="count" fill="#0B2545" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-text-muted text-sm">
-                No data yet
-              </div>
-            )}
-          </div>
-
-          {/* Gender pie */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-            <h2 className="font-bold text-text-primary mb-5">Gender Distribution</h2>
-            {genderData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie data={genderData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
-                    {genderData.map((entry) => (
-                      <Cell key={entry.name} fill={(PIE_COLORS as Record<string, string>)[entry.name] || "#8B5CF6"} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-text-muted text-sm">No data yet</div>
-            )}
-          </div>
-        </div>
-
-        {/* Category chart */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm overflow-hidden">
-          <h2 className="font-bold text-text-primary mb-4 sm:mb-5">Category Distribution</h2>
-          <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 sm:pt-0 sm:overflow-visible sm:grid sm:grid-cols-3 md:flex md:flex-wrap gap-3 sm:gap-6 snap-x snap-mandatory hide-scrollbar">
-            {categoryData.map((cat) => (
-              <div key={cat.name} className="flex-1 min-w-[130px] sm:min-w-0 snap-center text-center p-3 sm:p-4 rounded-xl bg-slate-50 border border-slate-100 shadow-sm sm:shadow-none">
-                <div className="text-xl sm:text-2xl font-black text-text-primary">{cat.count}</div>
-                <div className="text-[10px] sm:text-xs text-text-muted mt-1 leading-tight">{cat.name}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Registrations Table */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          {/* Table Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-text-primary">All Registrations</h2>
-              <Badge variant="outline" className="sm:hidden">{filtered.length} Total</Badge>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                <Input
-                  placeholder="Search by name, ID, dept…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 h-10 sm:h-9 text-sm w-full rounded-xl"
-                />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-10 sm:h-9 px-3 rounded-xl border border-slate-200 text-sm bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-orange/30 w-full sm:w-40 flex-shrink-0"
-              >
-                {["All", "Pending", "Approved", "Rejected"].map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
+        {/* ── Table ── */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input placeholder="Search registrations..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9 text-sm w-full bg-white border-slate-200 shadow-none focus-visible:ring-1 focus-visible:ring-slate-300" />
             </div>
           </div>
 
-          {/* Table */}
-          {/* Data Content */}
-          <div className="w-full">
+          <div className="overflow-x-auto min-h-[300px]">
             {isLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="w-10 h-10 rounded-full border-4 border-accent-orange/20 border-t-accent-orange animate-spin" />
-              </div>
+              <div className="h-[300px] flex items-center justify-center text-sm text-slate-500">Loading...</div>
             ) : filtered.length === 0 ? (
-              <div className="py-16 text-center text-text-muted text-sm px-4">
-                {registrations.length === 0
-                  ? "No registrations yet. Share the registration link with students!"
-                  : "No registrations match your search."}
-              </div>
+              <div className="h-[300px] flex items-center justify-center text-sm text-slate-500">No registrations found.</div>
             ) : (
-              <>
-                {/* Mobile List View (visible only on small screens) */}
-                <div className="block md:hidden divide-y divide-slate-100">
+              <table className="w-full text-sm text-left whitespace-nowrap">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-white">
+                    <th className="px-6 py-3 text-[11px] font-medium text-slate-500 uppercase tracking-wider">Team ID</th>
+                    <th className="px-6 py-3 text-[11px] font-medium text-slate-500 uppercase tracking-wider">Team Name</th>
+                    <th className="px-6 py-3 text-[11px] font-medium text-slate-500 uppercase tracking-wider">Department</th>
+                    <th className="px-6 py-3 text-[11px] font-medium text-slate-500 uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-3 text-[11px] font-medium text-slate-500 uppercase tracking-wider text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
                   {filtered.map((reg) => (
-                    <div key={reg.teamId} className="p-4 flex flex-col gap-3 hover:bg-slate-50/50 active:bg-slate-50 transition-colors cursor-pointer" onClick={() => setSelectedReg(reg)}>
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                          <h3 className="font-bold text-text-primary text-sm truncate">{reg.teamName}</h3>
-                          <p className="font-mono text-[10px] text-navy-primary font-bold mt-0.5 truncate">{reg.teamId}</p>
-                        </div>
-                        <Badge variant={statusBadgeVariant(reg.status as RegistrationStatus)} className="flex-shrink-0 text-[10px] px-2 py-0.5 mt-0.5 self-start">
-                          {reg.status}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <p className="text-[11px] text-text-muted line-clamp-1 flex-1 pr-2">{reg.department}</p>
-                        <div className="flex gap-1.5" onClick={(e) => e.stopPropagation()}>
-                          {reg.status !== "Approved" && (
-                            <Button variant="success" size="icon" className="h-7 w-7 rounded-lg shadow-sm" disabled={updatingId === reg.teamId} onClick={() => handleStatusUpdate(reg.teamId, "Approved")} title="Approve">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                            </Button>
-                          )}
-                          {reg.status !== "Rejected" && (
-                            <Button variant="destructive" size="icon" className="h-7 w-7 rounded-lg shadow-sm" disabled={updatingId === reg.teamId} onClick={() => handleStatusUpdate(reg.teamId, "Rejected")} title="Reject">
-                              <XCircle className="w-3.5 h-3.5" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <tr key={reg.teamId} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => setSelectedReg(reg)}>
+                      <td className="px-6 py-4 font-mono text-xs text-slate-600">{reg.teamId}</td>
+                      <td className="px-6 py-4 font-medium">{reg.teamName}</td>
+                      <td className="px-6 py-4 text-slate-600">{reg.department}</td>
+                      <td className="px-6 py-4 text-slate-600 capitalize">{reg.category?.replace("_", " ")}</td>
+                      <td className="px-6 py-4 text-right">
+                         <Button variant="ghost" size="sm" className="h-7 text-xs text-slate-500" onClick={() => setSelectedReg(reg)}>
+                           View Details <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                         </Button>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-
-                {/* Desktop Table View (hidden on small screens) */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-sm" role="table" aria-label="Registrations table">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/80">
-                        <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wide">Team ID</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wide">Team Name</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wide">Department</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wide hidden lg:table-cell">Category</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wide">Status</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wide">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {filtered.map((reg) => (
-                        <tr key={reg.teamId} className="hover:bg-slate-50/60 transition-colors">
-                          <td className="px-5 py-3 font-mono text-xs font-bold text-navy-primary">{reg.teamId}</td>
-                          <td className="px-4 py-3 font-semibold text-text-primary max-w-[160px] truncate">{reg.teamName}</td>
-                          <td className="px-4 py-3 text-text-muted max-w-[140px] truncate text-xs">{reg.department}</td>
-                          <td className="px-4 py-3 text-text-muted hidden lg:table-cell text-xs capitalize">{reg.category?.replace("_", " ")}</td>
-                          <td className="px-4 py-3">
-                            <Badge variant={statusBadgeVariant(reg.status as RegistrationStatus)}>
-                              {reg.status}
-                            </Badge>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1.5">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-text-muted hover:text-navy-primary" onClick={() => setSelectedReg(reg)} title="View">
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                              {reg.status !== "Approved" && (
-                                <Button variant="success" size="sm" className="h-7 px-2.5 text-xs" disabled={updatingId === reg.teamId} onClick={() => handleStatusUpdate(reg.teamId, "Approved")}>
-                                  Approve
-                                </Button>
-                              )}
-                              {reg.status !== "Rejected" && (
-                                <Button variant="destructive" size="sm" className="h-7 px-2.5 text-xs" disabled={updatingId === reg.teamId} onClick={() => handleStatusUpdate(reg.teamId, "Rejected")}>
-                                  Reject
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
+                </tbody>
+              </table>
             )}
           </div>
-
-          {/* Table footer */}
           {filtered.length > 0 && (
-            <div className="px-5 py-3 border-t border-slate-100 text-xs text-text-muted">
+            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 text-[11px] font-medium text-slate-500 text-center sm:text-left">
               Showing {filtered.length} of {registrations.length} registrations
             </div>
           )}
         </div>
-      </div>
+      </main>
 
-      {/* Team Detail Modal */}
+      {/* ── Clean Modal ── */}
       <Dialog open={!!selectedReg} onOpenChange={(open) => !open && setSelectedReg(null)}>
-        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl p-0">
+        <DialogContent className="max-w-[100vw] sm:max-w-3xl w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-hidden p-0 bg-white border-0 sm:border sm:border-slate-200 rounded-none sm:rounded-xl shadow-xl flex flex-col gap-0 m-0">
           {selectedReg && (
             <>
-              <DialogHeader className="p-4 sm:p-6 pb-4 sm:pb-5 sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-slate-100">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <DialogTitle className="truncate pr-8">{selectedReg.teamName}</DialogTitle>
-                    <DialogDescription className="font-mono text-[10px] sm:text-xs mt-0.5 truncate pr-8">
-                      {selectedReg.teamId}
-                    </DialogDescription>
-                  </div>
-                  <Badge variant={statusBadgeVariant(selectedReg.status as RegistrationStatus)} className="sm:ml-auto w-fit">
-                    {selectedReg.status}
-                  </Badge>
+              <DialogHeader className="p-6 border-b border-slate-200 bg-white flex-shrink-0">
+                <div className="flex flex-col text-left">
+                  <DialogTitle className="text-xl font-semibold mb-1 break-words">{selectedReg.teamName}</DialogTitle>
+                  <DialogDescription className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 border border-slate-200 break-all">{selectedReg.teamId}</span>
+                    <span className="text-slate-300 hidden sm:inline">•</span>
+                    <span className="w-full sm:w-auto">Registered on {selectedReg.timestamp}</span>
+                  </DialogDescription>
                 </div>
               </DialogHeader>
 
-              <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
-                {/* Meta */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-100">
+              <div className="p-6 overflow-y-auto space-y-8 text-sm text-left flex-1">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {[
                     { label: "Department", value: selectedReg.department },
-                    { label: "Academic Year", value: selectedReg.academicYear },
+                    { label: "Year", value: selectedReg.academicYear },
                     { label: "Category", value: selectedReg.category?.replace("_", " ") },
-                    { label: "Submitted", value: selectedReg.timestamp },
+                    { label: "Size", value: `${selectedReg.members?.length || 0} Members` },
                   ].map((item) => (
-                    <div key={item.label} className="flex flex-col gap-1">
-                      <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider">{item.label}</p>
-                      <p className="text-sm font-semibold text-text-primary capitalize leading-snug break-words">{item.value || "—"}</p>
+                    <div key={item.label}>
+                      <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">{item.label}</div>
+                      <div className="font-medium capitalize text-slate-900 truncate">{item.value || "—"}</div>
                     </div>
                   ))}
                 </div>
 
-                {/* Project (if available) */}
-                {(selectedReg.ideaTitle || selectedReg.problemStatement || selectedReg.presentationUrl) && (
-                  <div className="flex flex-col gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-100">
-                    {selectedReg.problemStatement && (
-                      <div>
-                        <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider mb-1.5">Problem Statement</p>
-                        <p className="text-sm font-medium text-text-primary leading-relaxed">{selectedReg.problemStatement}</p>
-                      </div>
-                    )}
-                    {selectedReg.ideaTitle && (
-                      <div>
-                        <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider mb-1.5">Idea Title</p>
-                        <p className="text-sm font-bold text-text-primary">{selectedReg.ideaTitle}</p>
-                      </div>
-                    )}
-                    {selectedReg.ideaDescription && (
-                      <div>
-                        <p className="text-[10px] sm:text-[11px] text-text-muted font-bold uppercase tracking-wider mb-1.5">Description</p>
-                        <p className="text-sm text-text-muted leading-relaxed">{selectedReg.ideaDescription}</p>
-                      </div>
-                    )}
-                    {selectedReg.presentationUrl && (
-                      <a
-                        href={selectedReg.presentationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 mt-2 px-4 py-3 sm:py-2.5 rounded-xl bg-navy-primary text-white text-xs sm:text-sm font-bold hover:bg-navy-secondary transition-colors"
-                      >
-                        <Download className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> View Presentation PDF
-                      </a>
-                    )}
-                  </div>
-                )}
-
-                {/* Members */}
-                {selectedReg.members?.length > 0 && (
-                  <div>
-                    <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 px-1">Team Members</p>
-                    <div className="space-y-2.5">
-                      {selectedReg.members.map((m, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-100 hover:border-slate-200 transition-colors">
-                          
-                          {/* Dot Indicator */}
-                          <div className={cn(
-                            "w-2 h-2 rounded-full flex-shrink-0 shadow-sm mt-1.5",
-                            m.gender === "Female" ? "bg-accent-orange" : m.gender === "Male" ? "bg-navy-primary" : "bg-emerald-500"
-                          )} />
-                          
-                          {/* Member Info */}
-                          <div className="flex flex-col flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className="font-bold text-text-primary text-sm truncate">{m.fullName}</span>
-                              <div className="flex items-center gap-1.5 flex-shrink-0">
-                                <Badge variant="outline" className="text-[9px] px-1.5 py-0 shadow-sm bg-white font-medium text-text-muted border-slate-200">
-                                  {m.gender}
-                                </Badge>
-                                {m.memberType === "Leader" && (
-                                  <span className="px-1.5 py-0.5 rounded-md bg-orange-100/80 border border-orange-200/50 text-accent-orange text-[9px] font-bold uppercase tracking-wider">
-                                    Leader
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <span className="text-text-muted text-[11px] sm:text-xs truncate">{m.email}</span>
-                          </div>
-                          
+                <div className="pt-6 border-t border-slate-200">
+                  <h3 className="text-sm font-semibold mb-4">Project Idea</h3>
+                  {(selectedReg.ideaTitle || selectedReg.problemStatement || selectedReg.ideaDescription || selectedReg.presentationUrl) ? (
+                    <div className="space-y-5 bg-slate-50 border border-slate-200 rounded-lg p-4 sm:p-5 break-words">
+                      {selectedReg.ideaSubmittedAt && (
+                        <div className="text-xs text-slate-500 mb-2">Submitted on: {selectedReg.ideaSubmittedAt}</div>
+                      )}
+                      {selectedReg.ideaTitle && (
+                        <div>
+                          <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">Title</div>
+                          <div className="font-medium text-base">{selectedReg.ideaTitle}</div>
                         </div>
-                      ))}
+                      )}
+                      {selectedReg.problemStatement && (
+                        <div>
+                          <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">Problem Statement</div>
+                          <div className="text-slate-700">{selectedReg.problemStatement}</div>
+                        </div>
+                      )}
+                      {selectedReg.ideaDescription && (
+                        <div>
+                          <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">Description</div>
+                          <div className="text-slate-700 whitespace-pre-wrap">{selectedReg.ideaDescription}</div>
+                        </div>
+                      )}
+                      {selectedReg.presentationUrl && (
+                        <div className="pt-2">
+                          <a href={selectedReg.presentationUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 break-all">
+                            <Download className="w-4 h-4 mr-2 flex-shrink-0" /> Download PDF
+                          </a>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-
-                {/* Status actions */}
-                <div className="flex flex-col sm:flex-row gap-2.5 pt-4 border-t border-slate-100">
-                  {selectedReg.status !== "Approved" && (
-                    <Button
-                      variant="success"
-                      className="flex-1 h-11 sm:h-10 text-sm font-semibold shadow-sm"
-                      disabled={updatingId === selectedReg.teamId}
-                      onClick={() => handleStatusUpdate(selectedReg.teamId, "Approved")}
-                    >
-                      <CheckCircle2 className="w-4 h-4" /> Approve Team
-                    </Button>
-                  )}
-                  {selectedReg.status !== "Rejected" && (
-                    <Button
-                      variant="destructive"
-                      className="flex-1 h-11 sm:h-10 text-sm font-semibold shadow-sm"
-                      disabled={updatingId === selectedReg.teamId}
-                      onClick={() => handleStatusUpdate(selectedReg.teamId, "Rejected")}
-                    >
-                      <XCircle className="w-4 h-4" /> Reject Team
-                    </Button>
-                  )}
-                  {selectedReg.status !== "Pending" && (
-                    <Button
-                      variant="outline"
-                      className="flex-1 h-11 sm:h-10 text-sm font-semibold"
-                      disabled={updatingId === selectedReg.teamId}
-                      onClick={() => handleStatusUpdate(selectedReg.teamId, "Pending")}
-                    >
-                      Reset to Pending
-                    </Button>
+                  ) : (
+                    <div className="text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
+                      No project idea submitted yet.
+                    </div>
                   )}
                 </div>
+
+                <div className="pt-6 border-t border-slate-200">
+                  <h3 className="text-sm font-semibold mb-4">Team Roster</h3>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {selectedReg.members?.map((m, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600 border border-slate-200 flex-shrink-0">
+                          {m.fullName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium text-sm truncate">{m.fullName}</div>
+                            {m.memberType === "Leader" && (
+                              <Badge variant="outline" className="h-4 px-1 text-[9px] uppercase shadow-none bg-slate-50 text-slate-600 flex-shrink-0">Leader</Badge>
+                            )}
+                          </div>
+                          <div className="text-xs text-slate-500 truncate">{m.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
+
             </>
           )}
         </DialogContent>
@@ -571,3 +268,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

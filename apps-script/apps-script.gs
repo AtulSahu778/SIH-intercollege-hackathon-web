@@ -8,24 +8,41 @@
  * 1. Open Google Sheets → Extensions → Apps Script
  * 2. Paste this entire file, replacing the default code
  * 3. Set DRIVE_FOLDER_ID below to your Google Drive folder ID
- * 4. Click Deploy → New Deployment → Web App
+ * 4. Click Deploy → New Deployment (or Manage Deployments → New Version) → Web App
  *    - Execute as: Me
  *    - Who has access: Anyone
  * 5. Copy the Web App URL
  * 6. Paste it into your .env.local as NEXT_PUBLIC_APPS_SCRIPT_URL
  *
- * SHEET NAMES: "Registrations", "Team Members", "Uploads"
+ * SHEET NAMES:
+ *   - "Registrations"  — Stores team information and approval status
+ *   - "Team Members"   — Stores leader and member details
+ *   - "Teams Idea"     — Stores submitted project ideas
+ *   - "Uploads"        — Presentation file links (optional)
+ *   - "Auth Letters"   — Authorization letter links (legacy)
+ *
+ * ACTIONS (POST):
+ *   register         — Register a new team
+ *   submitIdea       — Submit idea details (saved into "Teams Idea" sheet)
+ *   updateStatus     — Admin: update team approval status
+ *   verifyTeamId     — Verify a team ID exists
+ *   uploadAuthLetter — (Legacy) Upload authorization letter PDF
+ *
+ * ACTIONS (GET):
+ *   getRegistrations — Fetch all teams (Admin dashboard)
+ *   verifyTeamId     — Same verify, via GET query param
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIGURATION — Update these before deploying
 // ─────────────────────────────────────────────────────────────────────────────
-const DRIVE_FOLDER_ID = "1myhKtKh60lSuvsRSBuy7wkl6NJB1_0xm"; // Presentations folder
-const AUTH_LETTER_FOLDER_ID = "1pUZTHNsHJ7-tX094c9QR12GH5vd6TDLr"; // Authorization Letters folder
+const DRIVE_FOLDER_ID = "1myhKtKh60lSuvsRSBuy7wkl6NJB1_0xm";           // Presentations folder
+const AUTH_LETTER_FOLDER_ID = "1pUZTHNsHJ7-tX094c9QR12GH5vd6TDLr";    // Auth Letters folder (legacy)
 
 const SHEET_NAMES = {
   REGISTRATIONS: "Registrations",
   TEAM_MEMBERS: "Team Members",
+  TEAMS_IDEA: "Teams Idea",
   UPLOADS: "Uploads",
   AUTH_LETTERS: "Auth Letters",
 };
@@ -39,15 +56,13 @@ function corsResponse(data) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET Handler — Routes by action param
+// GET Handler
 // ─────────────────────────────────────────────────────────────────────────────
 function doGet(e) {
   try {
     const action = (e && e.parameter && e.parameter.action) || "getRegistrations";
 
-    if (action === "getRegistrations") {
-      return corsResponse(getRegistrations());
-    }
+    if (action === "getRegistrations") return corsResponse(getRegistrations());
 
     if (action === "verifyTeamId") {
       const teamId = e && e.parameter && e.parameter.teamId;
@@ -62,38 +77,25 @@ function doGet(e) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST Handler — Routes by action field in body or query param
+// POST Handler
 // ─────────────────────────────────────────────────────────────────────────────
 function doPost(e) {
   try {
     let body = {};
     if (e && e.postData && e.postData.contents) {
-      try {
-        body = JSON.parse(e.postData.contents);
-      } catch (parseErr) {
-        body = (e && e.parameter) || {};
-      }
+      try { body = JSON.parse(e.postData.contents); }
+      catch (parseErr) { body = (e && e.parameter) || {}; }
     } else if (e && e.parameter) {
       body = e.parameter;
     }
 
     const action = body.action || (e && e.parameter && e.parameter.action);
 
-    if (action === "register") {
-      return corsResponse(registerTeam(body));
-    }
-
-    if (action === "updateStatus") {
-      return corsResponse(updateStatus(body.teamId, body.status));
-    }
-
-    if (action === "verifyTeamId") {
-      return corsResponse(verifyTeamId(body.teamId || (e && e.parameter && e.parameter.teamId)));
-    }
-
-    if (action === "uploadAuthLetter") {
-      return corsResponse(uploadAuthLetterForTeam(body));
-    }
+    if (action === "register")         return corsResponse(registerTeam(body));
+    if (action === "submitIdea")       return corsResponse(submitIdeaForTeam(body));
+    if (action === "updateStatus")     return corsResponse(updateStatus(body.teamId, body.status));
+    if (action === "verifyTeamId")     return corsResponse(verifyTeamId(body.teamId || (e && e.parameter && e.parameter.teamId)));
+    if (action === "uploadAuthLetter") return corsResponse(uploadAuthLetterForTeam(body));
 
     return corsResponse({ success: false, error: "Unknown action: " + action });
   } catch (err) {
@@ -103,11 +105,8 @@ function doPost(e) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REGISTER TEAM
-// PDF upload is queued asynchronously via a time-based trigger so that
-// this function returns immediately without blocking on Drive I/O.
 // ─────────────────────────────────────────────────────────────────────────────
 function registerTeam(data) {
-  // ── Validate ──────────────────────────────────────────────────────────────
   if (!data.teamName || !data.department || !data.category) {
     return { success: false, error: "Missing required team information" };
   }
@@ -126,122 +125,54 @@ function registerTeam(data) {
     return { success: false, error: "All member emails must be unique" };
   }
 
-  // ── Check for duplicate team registration (same team name or leader email) ─
+  // Duplicate check — team name
   const regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
   const existingData = regSheet.getDataRange().getValues();
-  const leaderEmail = data.members[0]?.email?.toLowerCase();
+  const leaderEmail = data.members[0] && data.members[0].email && data.members[0].email.toLowerCase();
 
   for (let i = 1; i < existingData.length; i++) {
-    if (existingData[i][2]?.toLowerCase() === data.teamName?.toLowerCase()) {
+    if (existingData[i][2] &&
+        existingData[i][2].toLowerCase() === data.teamName.toLowerCase()) {
       return { success: false, error: "A team with this name is already registered" };
     }
   }
 
-  // Check in Team Members sheet for duplicate leader email
+  // Duplicate check — leader email
   const membersSheet = getSheet(SHEET_NAMES.TEAM_MEMBERS);
   const existingMembers = membersSheet.getDataRange().getValues();
   for (let i = 1; i < existingMembers.length; i++) {
-    if (existingMembers[i][2] === "Leader" && existingMembers[i][4]?.toLowerCase() === leaderEmail) {
+    if (existingMembers[i][1] === "Leader" &&
+        existingMembers[i][4] && existingMembers[i][4].toLowerCase() === leaderEmail) {
       return { success: false, error: "A registration with this team leader email already exists" };
     }
   }
 
-  // ── Generate Team ID ───────────────────────────────────────────────────────
   const teamId = generateTeamId();
-
-  // NOTE: PDF/PPT submission is a separate phase after registration.
-  // The pdfBase64 / pdfFileName fields are optional here.
-
   const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
-  // ── Save to Registrations sheet immediately ────────────────────────────────
+  // Save registration row
   regSheet.appendRow([
-    timestamp,                        // A: Timestamp
-    teamId,                           // B: Team ID
-    data.teamName,                    // C: Team Name
-    data.department,                  // D: Department
-    data.academicYear,                // E: Academic Year
-    data.category,                    // F: Category
-    data.problemStatement || "",      // G: Problem Statement
-    data.ideaTitle || "",             // H: Idea Title
-    data.ideaDescription || "",       // I: Idea Description
-    "Pending",                        // J: Status
+    timestamp,         // A: Timestamp
+    teamId,            // B: Team ID
+    data.teamName,     // C: Team Name
+    data.department,   // D: Department
+    data.academicYear, // E: Academic Year
+    data.category,     // F: Category
+    "Pending",         // G: Status
   ]);
 
-  // ── Save Team Members immediately ─────────────────────────────────────────
-  data.members.forEach((member) => {
+  // Save team members
+  data.members.forEach(function(member) {
     membersSheet.appendRow([
-      teamId,                    // A: Team ID
-      member.memberType,         // B: Member Type
-      member.fullName,           // C: Name
-      member.gender,             // D: Gender
-      member.email,              // E: Email
-      member.mobile,             // F: Mobile
+      teamId,
+      member.memberType,
+      member.fullName,
+      member.gender,
+      member.email,
+      member.mobile,
     ]);
   });
 
-  // ── Queue PDF upload via PropertiesService + time-based trigger ───────────
-  // PDF upload is optional at registration — only queue if payload is present.
-  if (data.pdfBase64 && data.pdfFileName) {
-    try {
-      const props = PropertiesService.getScriptProperties();
-      const pendingKey = "pdf_pending_" + teamId;
-      props.setProperty(pendingKey, JSON.stringify({
-        teamId: teamId,
-        pdfBase64: data.pdfBase64,
-        pdfFileName: data.pdfFileName,
-        timestamp: timestamp,
-      }));
-
-      // Create a one-time trigger to fire in 1 minute
-      ScriptApp.newTrigger("processPendingPdfUploads")
-        .timeBased()
-        .after(60 * 1000) // 1 minute from now
-        .create();
-    } catch (triggerErr) {
-      // Trigger creation failed — attempt synchronous fallback upload
-      console.warn("Async trigger failed, attempting sync upload:", triggerErr);
-      try {
-        const pdfUrl = uploadPDF(data.pdfBase64, data.pdfFileName, teamId);
-        const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
-        uploadsSheet.appendRow([teamId, pdfUrl, timestamp]);
-      } catch (uploadErr) {
-        // Log but don't fail — data is already saved
-        console.error("Sync PDF upload also failed:", uploadErr);
-      }
-    }
-  }
-
-  // ── Queue Auth Letter upload ──────────────────────────────────────────────
-  // Required — queue for async upload to the Auth Letters Drive folder.
-  if (data.authLetterBase64 && data.authLetterFileName) {
-    try {
-      const props = PropertiesService.getScriptProperties();
-      const letterKey = "auth_letter_pending_" + teamId;
-      props.setProperty(letterKey, JSON.stringify({
-        teamId: teamId,
-        base64: data.authLetterBase64,
-        fileName: data.authLetterFileName,
-        timestamp: timestamp,
-      }));
-
-      ScriptApp.newTrigger("processPendingAuthLetters")
-        .timeBased()
-        .after(60 * 1000)
-        .create();
-    } catch (triggerErr) {
-      console.warn("Auth letter trigger failed, attempting sync upload:", triggerErr);
-      try {
-        const letterUrl = uploadToFolder(data.authLetterBase64, data.authLetterFileName, teamId, AUTH_LETTER_FOLDER_ID);
-        const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
-        authSheet.appendRow([teamId, letterUrl, timestamp]);
-      } catch (uploadErr) {
-        console.error("Sync auth letter upload failed:", uploadErr);
-      }
-    }
-  }
-
-  // ── Respond immediately ───────────────────────────────────────────────────
   return {
     success: true,
     teamId: teamId,
@@ -250,152 +181,159 @@ function registerTeam(data) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ASYNC PDF UPLOAD PROCESSOR
-// Called by the time-based trigger created in registerTeam().
-// Reads all pending PDF jobs from PropertiesService, uploads them to Drive,
-// and records the URL in the Uploads sheet.
+// SUBMIT IDEA FOR TEAM (Saved directly to "Teams Idea" sheet)
 // ─────────────────────────────────────────────────────────────────────────────
-function processPendingPdfUploads() {
-  const props = PropertiesService.getScriptProperties();
-  const allProps = props.getProperties();
-  const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+function submitIdeaForTeam(data) {
+  var teamId           = data.teamId;
+  var problemStatement = data.problemStatement;
+  var ideaTitle        = data.ideaTitle;
+  var ideaDescription  = data.ideaDescription;
 
-  let processed = 0;
+  if (!teamId || !problemStatement || !ideaTitle || !ideaDescription) {
+    return {
+      success: false,
+      error: "teamId, problemStatement, ideaTitle, and ideaDescription are required.",
+    };
+  }
 
-  for (const key in allProps) {
-    if (!key.startsWith("pdf_pending_")) continue;
+  var normId = String(teamId).trim().toUpperCase();
 
-    try {
-      const job = JSON.parse(allProps[key]);
-      const pdfUrl = uploadPDF(job.pdfBase64, job.pdfFileName, job.teamId);
+  // 1. Verify team exists in Registrations sheet
+  var regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
+  var regData  = regSheet.getDataRange().getValues();
+  var teamRow  = null;
 
-      uploadsSheet.appendRow([
-        job.teamId,    // A: Team ID
-        pdfUrl,        // B: PDF URL
-        job.timestamp, // C: Submission Time
-      ]);
-
-      props.deleteProperty(key);
-      processed++;
-      console.log("PDF uploaded for team:", job.teamId, "->", pdfUrl);
-    } catch (err) {
-      console.error("Failed to upload PDF for key:", key, String(err));
-      // Leave the property so it can be retried on the next trigger run
+  for (var i = 1; i < regData.length; i++) {
+    if (String(regData[i][1]).trim().toUpperCase() === normId) {
+      teamRow = regData[i];
+      break;
     }
   }
 
-  // Clean up completed triggers
-  const triggers = ScriptApp.getProjectTriggers();
-  for (const trigger of triggers) {
-    if (trigger.getHandlerFunction() === "processPendingPdfUploads") {
-      ScriptApp.deleteTrigger(trigger);
+  if (!teamRow) {
+    return { success: false, error: "Team ID not found. Please verify your SIH Team ID." };
+  }
+
+  var teamName     = teamRow[2] || "";
+  var department   = teamRow[3] || "";
+  var academicYear = teamRow[4] || "";
+  var category     = teamRow[5] || "";
+
+  // 2. Check if team already submitted in "Teams Idea" sheet
+  var ideasSheet = getSheet(SHEET_NAMES.TEAMS_IDEA);
+  var ideasData  = ideasSheet.getDataRange().getValues();
+
+  for (var j = 1; j < ideasData.length; j++) {
+    if (String(ideasData[j][1]).trim().toUpperCase() === normId) {
+      return {
+        success: false,
+        alreadySubmittedIdea: true,
+        error: "Team " + teamName + " (" + normId + ") has already submitted an idea in the Teams Idea sheet.",
+      };
     }
   }
 
-  console.log("processPendingPdfUploads: processed", processed, "job(s)");
+  // 3. Append to "Teams Idea" sheet
+  var timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  ideasSheet.appendRow([
+    timestamp,        // A: Timestamp
+    normId,           // B: Team ID
+    teamName,         // C: Team Name
+    department,       // D: Department
+    academicYear,     // E: Academic Year
+    category,         // F: Category
+    problemStatement, // G: Problem Statement
+    ideaTitle,        // H: Idea Title
+    ideaDescription,  // I: Idea Description
+  ]);
+
+  console.log("Saved to Teams Idea sheet for team:", normId, "- Title:", ideaTitle);
+
+  return {
+    success: true,
+    teamId: normId,
+    message: "Idea submitted successfully to Teams Idea sheet!",
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ASYNC AUTH LETTER UPLOAD PROCESSOR
-// Called by the time-based trigger created in registerTeam().
-// Reads all pending auth letter jobs, uploads to the Auth Letters Drive folder,
-// and records the URL in the Auth Letters sheet.
-// ─────────────────────────────────────────────────────────────────────────────
-function processPendingAuthLetters() {
-  const props = PropertiesService.getScriptProperties();
-  const allProps = props.getProperties();
-  const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
-
-  let processed = 0;
-
-  for (const key in allProps) {
-    if (!key.startsWith("auth_letter_pending_")) continue;
-
-    try {
-      const job = JSON.parse(allProps[key]);
-      const letterUrl = uploadToFolder(job.base64, job.fileName, job.teamId, AUTH_LETTER_FOLDER_ID);
-
-      authSheet.appendRow([
-        job.teamId,    // A: Team ID
-        letterUrl,     // B: File URL
-        job.timestamp, // C: Submission Time
-      ]);
-
-      props.deleteProperty(key);
-      processed++;
-      console.log("Auth letter uploaded for team:", job.teamId, "->", letterUrl);
-    } catch (err) {
-      console.error("Failed to upload auth letter for key:", key, String(err));
-      // Leave the property so it can be retried on the next trigger run
-    }
-  }
-
-  // Clean up completed triggers
-  const triggers = ScriptApp.getProjectTriggers();
-  for (const trigger of triggers) {
-    if (trigger.getHandlerFunction() === "processPendingAuthLetters") {
-      ScriptApp.deleteTrigger(trigger);
-    }
-  }
-
-  console.log("processPendingAuthLetters: processed", processed, "job(s)");
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GET REGISTRATIONS
+// GET REGISTRATIONS (Admin dashboard)
+// Merges Registrations, Team Members, Teams Idea, and Uploads
 // ─────────────────────────────────────────────────────────────────────────────
 function getRegistrations() {
-  const regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
-  const membersSheet = getSheet(SHEET_NAMES.TEAM_MEMBERS);
-  const uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+  var regSheet     = getSheet(SHEET_NAMES.REGISTRATIONS);
+  var membersSheet = getSheet(SHEET_NAMES.TEAM_MEMBERS);
+  var ideasSheet   = getSheet(SHEET_NAMES.TEAMS_IDEA);
+  var uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
 
-  const regData = regSheet.getDataRange().getValues();
-  const membersData = membersSheet.getDataRange().getValues();
-  const uploadsData = uploadsSheet.getDataRange().getValues();
+  var regData     = regSheet.getDataRange().getValues();
+  var membersData = membersSheet.getDataRange().getValues();
+  var ideasData   = ideasSheet.getDataRange().getValues();
+  var uploadsData = uploadsSheet.getDataRange().getValues();
 
-  if (regData.length <= 1) {
-    return { success: true, data: [] };
-  }
+  if (regData.length <= 1) return { success: true, data: [] };
 
-  // Build member and upload lookups
-  const membersByTeam = {};
-  for (let i = 1; i < membersData.length; i++) {
-    const row = membersData[i];
-    const teamId = row[0];
-    if (!membersByTeam[teamId]) membersByTeam[teamId] = [];
-    membersByTeam[teamId].push({
+  // Build member lookup
+  var membersByTeam = {};
+  for (var i = 1; i < membersData.length; i++) {
+    var row = membersData[i];
+    var tid = row[0];
+    if (!membersByTeam[tid]) membersByTeam[tid] = [];
+    membersByTeam[tid].push({
       memberType: row[1],
-      fullName: row[2],
-      gender: row[3],
-      email: row[4],
-      mobile: row[5],
+      fullName:   row[2],
+      gender:     row[3],
+      email:      row[4],
+      mobile:     row[5],
     });
   }
 
-  const uploadsByTeam = {};
-  for (let i = 1; i < uploadsData.length; i++) {
-    const row = uploadsData[i];
-    uploadsByTeam[row[0]] = row[1]; // teamId → pdfUrl
+  // Build ideas lookup from "Teams Idea" sheet
+  var ideasByTeam = {};
+  for (var m = 1; m < ideasData.length; m++) {
+    var iRow = ideasData[m];
+    var iTid = String(iRow[1]).trim().toUpperCase();
+    ideasByTeam[iTid] = {
+      timestamp:        String(iRow[0] || ""),
+      problemStatement: iRow[6] || "",
+      ideaTitle:        iRow[7] || "",
+      ideaDescription:  iRow[8] || "",
+    };
+  }
+
+  // Build uploads lookup
+  var uploadsByTeam = {};
+  for (var j = 1; j < uploadsData.length; j++) {
+    uploadsByTeam[uploadsData[j][0]] = uploadsData[j][1];
   }
 
   // Build registrations array
-  const registrations = [];
-  for (let i = 1; i < regData.length; i++) {
-    const row = regData[i];
-    const teamId = row[1];
+  var registrations = [];
+  for (var k = 1; k < regData.length; k++) {
+    var r = regData[k];
+    var teamId = String(r[1]).trim().toUpperCase();
+    var ideaInfo = ideasByTeam[teamId] || {};
+
+    // Support both older layout (status in col G or J) and new layout
+    var status = r[6] || r[9] || "Pending";
+    if (status !== "Approved" && status !== "Rejected" && status !== "Pending") {
+      status = r[9] || "Pending";
+    }
+
     registrations.push({
-      timestamp: String(row[0]),
-      teamId: teamId,
-      teamName: row[2],
-      department: row[3],
-      academicYear: row[4],
-      category: row[5],
-      problemStatement: row[6],
-      ideaTitle: row[7],
-      ideaDescription: row[8],
-      status: row[9] || "Pending",
-      members: membersByTeam[teamId] || [],
-      presentationUrl: uploadsByTeam[teamId] || "",
+      timestamp:        String(r[0]),
+      teamId:           teamId,
+      teamName:         r[2],
+      department:       r[3],
+      academicYear:     r[4],
+      category:         r[5],
+      problemStatement: ideaInfo.problemStatement || (r[6] !== status ? r[6] : "") || "",
+      ideaTitle:        ideaInfo.ideaTitle || r[7] || "",
+      ideaDescription:  ideaInfo.ideaDescription || r[8] || "",
+      status:           status,
+      ideaSubmittedAt:  ideaInfo.timestamp || r[10] || "",
+      members:          membersByTeam[teamId] || [],
+      presentationUrl:  uploadsByTeam[teamId] || "",
     });
   }
 
@@ -406,45 +344,45 @@ function getRegistrations() {
 // UPDATE STATUS
 // ─────────────────────────────────────────────────────────────────────────────
 function updateStatus(teamId, status) {
-  if (!teamId || !status) {
-    return { success: false, error: "teamId and status are required" };
-  }
+  if (!teamId || !status) return { success: false, error: "teamId and status are required" };
 
-  const validStatuses = ["Pending", "Approved", "Rejected"];
-  if (!validStatuses.includes(status)) {
+  var validStatuses = ["Pending", "Approved", "Rejected"];
+  if (validStatuses.indexOf(status) === -1) {
     return { success: false, error: "Invalid status. Must be: Pending, Approved, or Rejected" };
   }
 
-  const sheet = getSheet(SHEET_NAMES.REGISTRATIONS);
-  const data = sheet.getDataRange().getValues();
+  var sheet = getSheet(SHEET_NAMES.REGISTRATIONS);
+  var data  = sheet.getDataRange().getValues();
+  var normId = String(teamId).trim().toUpperCase();
 
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][1] === teamId) {
-      sheet.getRange(i + 1, 10).setValue(status); // Column J = Status
-      return { success: true, message: `Status updated to ${status}` };
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][1]).trim().toUpperCase() === normId) {
+      // If status column is col G (7) or col J (10)
+      var statusCol = data[0].indexOf("Status") + 1;
+      if (statusCol <= 0) statusCol = 7;
+      sheet.getRange(i + 1, statusCol).setValue(status);
+      return { success: true, message: "Status updated to " + status };
     }
   }
 
-  return { success: false, error: `Team ID ${teamId} not found` };
+  return { success: false, error: "Team ID " + teamId + " not found" };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VERIFY TEAM ID
-// Returns whether a teamId exists in the Registrations sheet, and checks if
-// they have already uploaded an authorization letter (blocking duplicate uploads).
 // ─────────────────────────────────────────────────────────────────────────────
 function verifyTeamId(teamId) {
   if (!teamId) return { success: false, error: "teamId is required" };
 
   try {
-    const normId = String(teamId).trim().toUpperCase();
+    var normId = String(teamId).trim().toUpperCase();
 
-    // 1. Check in Registrations sheet
-    const regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
-    const regData = regSheet.getDataRange().getValues();
-    let teamName = null;
+    // 1. Registrations sheet
+    var regSheet = getSheet(SHEET_NAMES.REGISTRATIONS);
+    var regData  = regSheet.getDataRange().getValues();
+    var teamName = null;
 
-    for (let i = 1; i < regData.length; i++) {
+    for (var i = 1; i < regData.length; i++) {
       if (String(regData[i][1]).trim().toUpperCase() === normId) {
         teamName = regData[i][2] || "Registered Team";
         break;
@@ -455,69 +393,73 @@ function verifyTeamId(teamId) {
       return { success: false, exists: false, error: "Team ID not found. Please verify your SIH Team ID." };
     }
 
-    // 2. Check in Auth Letters sheet
-    const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
-    const authData = authSheet.getDataRange().getValues();
+    // 2. Teams Idea sheet
+    var ideasSheet = getSheet(SHEET_NAMES.TEAMS_IDEA);
+    var ideasData  = ideasSheet.getDataRange().getValues();
+    var ideaAlreadySubmitted = false;
 
-    for (let j = 1; j < authData.length; j++) {
-      if (String(authData[j][0]).trim().toUpperCase() === normId) {
-        return {
-          success: false,
-          exists: true,
-          alreadySubmitted: true,
-          teamName: teamName,
-          error: "Team " + teamName + " (" + normId + ") has already submitted an authorization letter. Multiple uploads are not allowed.",
-        };
+    for (var k = 1; k < ideasData.length; k++) {
+      if (String(ideasData[k][1]).trim().toUpperCase() === normId) {
+        ideaAlreadySubmitted = true;
+        break;
       }
     }
 
-    return { success: true, exists: true, alreadySubmitted: false, teamName: teamName };
+    // 3. Auth Letters sheet (legacy)
+    var authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
+    var authData  = authSheet.getDataRange().getValues();
+    var authLetterSubmitted = false;
+
+    for (var j = 1; j < authData.length; j++) {
+      if (String(authData[j][0]).trim().toUpperCase() === normId) {
+        authLetterSubmitted = true;
+        break;
+      }
+    }
+
+    return {
+      success:              true,
+      exists:               true,
+      teamName:             teamName,
+      alreadySubmittedIdea: ideaAlreadySubmitted,
+      alreadySubmitted:     authLetterSubmitted,
+    };
   } catch (err) {
     return { success: false, error: "Error verifying team: " + String(err) };
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// UPLOAD AUTH LETTER (post-registration upload)
-// One-time only — strictly blocks duplicate submissions.
+// UPLOAD AUTH LETTER (legacy — kept for backward compatibility)
 // ─────────────────────────────────────────────────────────────────────────────
 function uploadAuthLetterForTeam(data) {
-  const { teamId, base64, fileName } = data;
+  var teamId   = data.teamId;
+  var base64   = data.base64;
+  var fileName = data.fileName;
 
   if (!teamId || !base64 || !fileName) {
     return { success: false, error: "teamId, base64, and fileName are required." };
   }
 
-  const normId = String(teamId).trim().toUpperCase();
+  var normId = String(teamId).trim().toUpperCase();
+  var verify = verifyTeamId(normId);
 
-  // Verify team exists & check duplicate
-  const verify = verifyTeamId(normId);
-  if (!verify.exists) {
-    return { success: false, error: verify.error || "Team not found." };
-  }
-  if (verify.alreadySubmitted) {
-    return { success: false, alreadySubmitted: true, error: "Your team has already submitted an authorization letter. Re-upload is not permitted." };
-  }
+  if (!verify.exists)          return { success: false, error: verify.error || "Team not found." };
+  if (verify.alreadySubmitted) return { success: false, alreadySubmitted: true, error: "Your team has already submitted an authorization letter." };
 
-  // Double-check Auth Letters sheet directly
-  const authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
-  const existingData = authSheet.getDataRange().getValues();
-  for (let i = 1; i < existingData.length; i++) {
+  var authSheet    = getSheet(SHEET_NAMES.AUTH_LETTERS);
+  var existingData = authSheet.getDataRange().getValues();
+  for (var i = 1; i < existingData.length; i++) {
     if (String(existingData[i][0]).trim().toUpperCase() === normId) {
-      return { success: false, alreadySubmitted: true, error: "Your team has already submitted an authorization letter. Re-upload is not permitted." };
+      return { success: false, alreadySubmitted: true, error: "Your team has already submitted an authorization letter." };
     }
   }
 
-  // Upload to Drive
-  const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  var timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   try {
-    const letterUrl = uploadToFolder(base64, fileName, normId, AUTH_LETTER_FOLDER_ID);
+    var letterUrl = uploadToFolder(base64, fileName, normId, AUTH_LETTER_FOLDER_ID);
     authSheet.appendRow([normId, letterUrl, timestamp]);
-    return {
-      success: true,
-      message: "Authorization letter submitted successfully.",
-      url: letterUrl,
-    };
+    return { success: true, message: "Authorization letter submitted successfully.", url: letterUrl };
   } catch (err) {
     console.error("uploadAuthLetterForTeam error:", String(err));
     return { success: false, error: "Failed to upload file. Please try again." };
@@ -528,89 +470,81 @@ function uploadAuthLetterForTeam(data) {
 // UPLOAD PDF TO DRIVE
 // ─────────────────────────────────────────────────────────────────────────────
 function uploadPDF(base64Data, fileName, teamId) {
-  let folderId = DRIVE_FOLDER_ID;
-  if (folderId.includes("/folders/")) {
+  var folderId = DRIVE_FOLDER_ID;
+  if (folderId.indexOf("/folders/") !== -1) {
     folderId = folderId.split("/folders/")[1].split("?")[0].split("/")[0];
   }
-  const folder = DriveApp.getFolderById(folderId);
-
-  // Decode base64
-  const decoded = Utilities.base64Decode(base64Data);
-  const blob = Utilities.newBlob(decoded, "application/pdf", `${teamId}_${fileName}`);
-
-  // Create file in Drive
-  const file = folder.createFile(blob);
+  var folder  = DriveApp.getFolderById(folderId);
+  var decoded = Utilities.base64Decode(base64Data);
+  var blob    = Utilities.newBlob(decoded, "application/pdf", teamId + "_" + fileName);
+  var file    = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
   return file.getUrl();
 }
+
 // ─────────────────────────────────────────────────────────────────────────────
-// UPLOAD FILE TO DRIVE (generic — supports any folder)
+// UPLOAD FILE TO DRIVE (generic)
 // ─────────────────────────────────────────────────────────────────────────────
 function uploadToFolder(base64Data, fileName, teamId, folderId) {
-  // Strip any full URL down to just the ID
-  if (folderId.includes("/folders/")) {
+  if (folderId.indexOf("/folders/") !== -1) {
     folderId = folderId.split("/folders/")[1].split("?")[0].split("/")[0];
   }
-  const folder = DriveApp.getFolderById(folderId);
-
-  const decoded = Utilities.base64Decode(base64Data);
-  const blob = Utilities.newBlob(decoded, "application/pdf", `${teamId}_${fileName}`);
-
-  const file = folder.createFile(blob);
+  var folder  = DriveApp.getFolderById(folderId);
+  var decoded = Utilities.base64Decode(base64Data);
+  var blob    = Utilities.newBlob(decoded, "application/pdf", teamId + "_" + fileName);
+  var file    = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
   return file.getUrl();
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// GENERATE TEAM ID
 // ─────────────────────────────────────────────────────────────────────────────
 function generateTeamId() {
-  const sheet = getSheet(SHEET_NAMES.REGISTRATIONS);
-  const lastRow = sheet.getLastRow();
-  const count = Math.max(lastRow, 1); // At least 1 (header row)
-  const teamNumber = String(count).padStart(3, "0");
-  return `SIH-2026-${teamNumber}`;
+  var sheet   = getSheet(SHEET_NAMES.REGISTRATIONS);
+  var lastRow = sheet.getLastRow();
+  var count   = Math.max(lastRow, 1);
+  return "SIH-2026-" + String(count).padStart(3, "0");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET SHEET (create if missing)
+// GET SHEET (automatically creates tab and styled headers if missing)
 // ─────────────────────────────────────────────────────────────────────────────
 function getSheet(name) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(name);
-
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(name);
   if (!sheet) {
     sheet = ss.insertSheet(name);
     setupSheetHeaders(sheet, name);
   }
-
   return sheet;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SETUP HEADERS (first run)
+// SETUP HEADERS
 // ─────────────────────────────────────────────────────────────────────────────
 function setupSheetHeaders(sheet, name) {
-  const headers = {
-    [SHEET_NAMES.REGISTRATIONS]: [
-      "Timestamp", "Team ID", "Team Name", "Department", "Academic Year",
-      "Category", "Problem Statement", "Idea Title", "Idea Description", "Status"
-    ],
-    [SHEET_NAMES.TEAM_MEMBERS]: [
-      "Team ID", "Member Type", "Name", "Gender", "Email", "Mobile"
-    ],
-    [SHEET_NAMES.UPLOADS]: [
-      "Team ID", "Presentation PDF URL", "Submission Time"
-    ],
-    [SHEET_NAMES.AUTH_LETTERS]: [
-      "Team ID", "Authorization Letter URL", "Submission Time"
-    ],
-  };
+  var headers = {};
+  headers[SHEET_NAMES.REGISTRATIONS] = [
+    "Timestamp", "Team ID", "Team Name", "Department", "Academic Year", "Category", "Status",
+  ];
+  headers[SHEET_NAMES.TEAM_MEMBERS] = [
+    "Team ID", "Member Type", "Name", "Gender", "Email", "Mobile",
+  ];
+  headers[SHEET_NAMES.TEAMS_IDEA] = [
+    "Timestamp", "Team ID", "Team Name", "Department", "Academic Year",
+    "Category", "Problem Statement", "Idea Title", "Idea Description",
+  ];
+  headers[SHEET_NAMES.UPLOADS] = [
+    "Team ID", "Presentation PDF URL", "Submission Time",
+  ];
+  headers[SHEET_NAMES.AUTH_LETTERS] = [
+    "Team ID", "Authorization Letter URL", "Submission Time",
+  ];
 
-  const headerRow = headers[name];
+  var headerRow = headers[name];
   if (headerRow) {
-    const range = sheet.getRange(1, 1, 1, headerRow.length);
+    var range = sheet.getRange(1, 1, 1, headerRow.length);
     range.setValues([headerRow]);
     range.setFontWeight("bold");
     range.setBackground("#0B2545");
@@ -620,9 +554,9 @@ function setupSheetHeaders(sheet, name) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// INIT — Run this manually once after pasting to set up sheets
+// INIT — Run this manually once from Apps Script editor to create all sheets
 // ─────────────────────────────────────────────────────────────────────────────
 function initializeSheets() {
-  Object.values(SHEET_NAMES).forEach(name => getSheet(name));
-  SpreadsheetApp.getUi().alert("✅ All sheets initialized successfully!");
+  Object.values(SHEET_NAMES).forEach(function(name) { getSheet(name); });
+  SpreadsheetApp.getUi().alert("All sheets (including 'Teams Idea') initialized successfully!");
 }

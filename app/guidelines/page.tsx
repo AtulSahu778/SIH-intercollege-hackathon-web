@@ -411,10 +411,10 @@ export default function GuidelinesPage() {
               {COLLEGE.shortName} at SIH 2026.
             </p>
             <a
-              href="/authletterupload"
+              href="/submit-idea"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white font-semibold text-sm shadow-lg hover:bg-orange-500 transition-colors duration-200"
             >
-              Upload Authorization Letter →
+              Submit Your Idea →
             </a>
           </div>
         </div>

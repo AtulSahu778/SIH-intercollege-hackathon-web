@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Upload, ScrollText } from "lucide-react";
+import { Lightbulb, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import pmBanner from "@/app/images/sih2025-slider-banner-PM-Banner2.png";
@@ -141,9 +141,9 @@ export default function HeroSection() {
                 size="xl"
                 className="w-full sm:w-auto bg-gradient-to-r from-accent-orange via-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-98 transition-all duration-300 group border border-orange-400/30"
               >
-                <Link href="/authletterupload" className="flex items-center justify-center gap-2.5">
-                  <Upload className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                  <span>Upload Authorization Letter</span>
+                <Link href="/submit-idea" className="flex items-center justify-center gap-2.5">
+                  <Lightbulb className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                  <span>Submit Your Idea</span>
                 </Link>
               </Button>
 

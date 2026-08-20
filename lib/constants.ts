@@ -242,3 +242,9 @@ export const REGISTRATION_DEADLINE = new Date("2026-08-14T00:00:00+05:30");
 // Admin
 // ─────────────────────────────────────────────────────────────────────────────
 export const ADMIN_SESSION_KEY = "sxc_sih_admin_session";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Registration Deadline
+// ─────────────────────────────────────────────────────────────────────────────
+// STRICT DEADLINE: August 21, 2026 at 6:00 PM IST
+export const REGISTRATION_DEADLINE = new Date("2026-08-21T18:00:00+05:30");

@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import RegistrationNotice from "@/components/registration/RegistrationNotice";
 import Section1TeamInfo from "@/components/registration/Section1TeamInfo";
 import Section2TeamDetails from "@/components/registration/Section2TeamDetails";
-import AuthLetterUpload from "@/components/registration/AuthLetterUpload";
+import RegistrationClosed from "@/components/registration/RegistrationClosed";
 
 import {
   registrationSchema,
@@ -197,8 +197,8 @@ export default function RegistrationForm() {
     <FormProvider {...methods}>
       <div className="max-w-3xl mx-auto">
 
-        {/* Registration Closed → Auth Letter Upload */}
-        {!isOpen && <AuthLetterUpload />}
+        {/* Registration Closed Message */}
+        {!isOpen && <RegistrationClosed />}
 
         {isOpen && (
           <>

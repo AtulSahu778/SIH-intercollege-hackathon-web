@@ -16,7 +16,6 @@ import sxcLogo from "@/app/images/sxclogo.jpg";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/guidelines", label: "Guidelines" },
-  { href: "/submit-idea", label: "Submit Idea", highlight: true },
 ];
 
 export default function Navbar() {

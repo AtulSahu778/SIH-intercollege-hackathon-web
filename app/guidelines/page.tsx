@@ -406,16 +406,10 @@ export default function GuidelinesPage() {
           <div className="absolute inset-0 grid-pattern opacity-30" />
           <div className="relative">
             <h2 className="font-black text-xl mb-2">Ready to Innovate?</h2>
-            <p className="text-white/60 text-sm mb-5">
-              Register your team now and take the first step towards representing{" "}
-              {COLLEGE.shortName} at SIH 2026.
+            <p className="text-white/60 text-sm">
+              Registration is now closed. Stay tuned for updates on the internal hackathon
+              scheduled for September 7, 2026.
             </p>
-            <a
-              href="/submit-idea"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent-orange text-white font-semibold text-sm shadow-lg hover:bg-orange-500 transition-colors duration-200"
-            >
-              Submit Your Idea →
-            </a>
           </div>
         </div>
       </div>

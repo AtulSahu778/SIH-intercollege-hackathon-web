@@ -1,11 +1,37 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
-import { Lightbulb, ScrollText } from "lucide-react";
+import { ScrollText, Zap, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import pmBanner from "@/app/images/sih2025-slider-banner-PM-Banner2.png";
+import { PORTAL_CLOSED } from "@/lib/constants";
+
+const HACKATHON_DATE = new Date("2026-09-07T09:00:00+05:30");
+
+function useCountdown() {
+  const [t, setT] = useState<{ d: number; h: number; m: number; s: number; over: boolean } | null>(null);
+  useEffect(() => {
+    const calc = () => {
+      const total = HACKATHON_DATE.getTime() - Date.now();
+      if (total <= 0) return setT({ d: 0, h: 0, m: 0, s: 0, over: true });
+      setT({
+        d: Math.floor(total / 86400000),
+        h: Math.floor((total % 86400000) / 3600000),
+        m: Math.floor((total % 3600000) / 60000),
+        s: Math.floor((total % 60000) / 1000),
+        over: false,
+      });
+    };
+    calc();
+    const id = setInterval(calc, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return t;
+}
+
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -25,6 +51,59 @@ const itemVariants: Variants = {
     transition: { duration: 0.35, ease: "easeOut" as const },
   },
 };
+
+function HackathonDateBanner() {
+  const t = useCountdown();
+
+  return (
+    <motion.div
+      variants={itemVariants}
+      className="flex flex-col items-center justify-center mt-8 sm:mt-12 w-full max-w-md mx-auto"
+    >
+      <div className="flex flex-col items-center justify-center mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+          <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-accent-orange" strokeWidth={2.5} />
+          <span className="text-[11px] sm:text-sm font-bold uppercase tracking-widest text-accent-orange">
+            Internal Hackathon
+          </span>
+        </div>
+        <div className="text-4xl sm:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-accent-orange via-orange-400 to-amber-300 tracking-tight leading-none text-center drop-shadow-sm">
+          7 Sept 2026
+        </div>
+      </div>
+
+      {t && !t.over && (
+        <div className="flex items-start justify-center gap-3 sm:gap-6 w-full px-1 sm:px-0">
+          <div className="text-center flex-1 sm:flex-none sm:w-20">
+            <div className="text-3xl sm:text-4xl font-black text-white leading-none tabular-nums tracking-tighter">{String(t.d).padStart(2, "0")}</div>
+            <div className="text-[10px] sm:text-xs text-white/40 font-bold uppercase tracking-widest mt-2 sm:mt-3 leading-tight">Days</div>
+          </div>
+          <span className="text-white/20 text-3xl font-black mt-[-2px] sm:mt-0 opacity-50">:</span>
+          <div className="text-center flex-1 sm:flex-none sm:w-20">
+            <div className="text-3xl sm:text-4xl font-black text-white leading-none tabular-nums tracking-tighter">{String(t.h).padStart(2, "0")}</div>
+            <div className="text-[10px] sm:text-xs text-white/40 font-bold uppercase tracking-widest mt-2 sm:mt-3 leading-tight">Hours</div>
+          </div>
+          <span className="text-white/20 text-3xl font-black mt-[-2px] sm:mt-0 opacity-50">:</span>
+          <div className="text-center flex-1 sm:flex-none sm:w-20">
+            <div className="text-3xl sm:text-4xl font-black text-white leading-none tabular-nums tracking-tighter">{String(t.m).padStart(2, "0")}</div>
+            <div className="text-[10px] sm:text-xs text-white/40 font-bold uppercase tracking-widest mt-2 sm:mt-3 leading-tight">Mins</div>
+          </div>
+          <span className="text-white/20 text-3xl font-black mt-[-2px] sm:mt-0 opacity-50">:</span>
+          <div className="text-center flex-1 sm:flex-none sm:w-20">
+            <div className="text-3xl sm:text-4xl font-black text-white leading-none tabular-nums tracking-tighter">{String(t.s).padStart(2, "0")}</div>
+            <div className="text-[10px] sm:text-xs text-white/40 font-bold uppercase tracking-widest mt-2 sm:mt-3 leading-tight">Secs</div>
+          </div>
+        </div>
+      )}
+
+      {t?.over && (
+        <p className="text-center text-sm text-white/50 font-medium">
+          The hackathon is underway. Good luck!
+        </p>
+      )}
+    </motion.div>
+  );
+}
 
 export default function HeroSection() {
   return (
@@ -112,40 +191,32 @@ export default function HeroSection() {
               <span className="text-white/90 font-semibold">Smart India Hackathon 2026</span>.
             </motion.p>
 
-            {/* Stats mini bar */}
-            <motion.div
-              variants={itemVariants}
-              className="flex items-start justify-between sm:justify-center gap-2 sm:gap-10 mt-8 sm:mt-12 w-full max-w-md mx-auto px-1 sm:px-0"
-            >
-              {[
-                { value: "24", label: "Hour Hackathon" },
-                { value: "6", label: "Members/Team" },
-                { value: "SIH", label: "Nomination Awaits" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center flex-1 sm:flex-none sm:w-24">
-                  <div className="text-2xl sm:text-3xl font-black text-white leading-none">{stat.value}</div>
-                  <div className="text-[10px] sm:text-xs text-white/40 font-medium mt-1.5 sm:mt-2 leading-tight px-1 sm:px-0">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-
+            {/* Hackathon Date Announcement or Stats */}
+            {PORTAL_CLOSED ? (
+              <HackathonDateBanner />
+            ) : (
+              <motion.div
+                variants={itemVariants}
+                className="flex items-start justify-between sm:justify-center gap-2 sm:gap-10 mt-8 sm:mt-12 w-full max-w-md mx-auto px-1 sm:px-0"
+              >
+                {[
+                  { value: "24", label: "Hour Hackathon" },
+                  { value: "6", label: "Members/Team" },
+                  { value: "SIH", label: "Nomination Awaits" },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center flex-1 sm:flex-none sm:w-24">
+                    <div className="text-2xl sm:text-3xl font-black text-white leading-none">{stat.value}</div>
+                    <div className="text-[10px] sm:text-xs text-white/40 font-medium mt-1.5 sm:mt-2 leading-tight px-1 sm:px-0">{stat.label}</div>
+                  </div>
+                ))}
+              </motion.div>
+            )}
 
             {/* CTAs */}
             <motion.div
               variants={itemVariants}
               className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-4 w-full sm:w-auto"
             >
-              <Button
-                asChild
-                size="xl"
-                className="w-full sm:w-auto bg-gradient-to-r from-accent-orange via-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-98 transition-all duration-200 border border-orange-400/30"
-              >
-                <Link href="/submit-idea" className="flex items-center justify-center gap-2.5">
-                  <Lightbulb className="w-5 h-5" />
-                  <span>Submit Your Idea</span>
-                </Link>
-              </Button>
-
               <Button
                 asChild
                 size="xl"

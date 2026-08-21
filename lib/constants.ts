@@ -232,11 +232,6 @@ export const FEATURES = [
   },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Registration Deadline
-// Thursday night → 12:00 AM midnight (start of Fri, Aug 14, 2026) IST
-// ─────────────────────────────────────────────────────────────────────────────
-export const REGISTRATION_DEADLINE = new Date("2026-08-14T00:00:00+05:30");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin
@@ -246,5 +241,5 @@ export const ADMIN_SESSION_KEY = "sxc_sih_admin_session";
 // ─────────────────────────────────────────────────────────────────────────────
 // Registration Deadline
 // ─────────────────────────────────────────────────────────────────────────────
-// STRICT DEADLINE: August 21, 2026 at 6:00 PM IST
-export const REGISTRATION_DEADLINE = new Date("2026-08-21T18:00:00+05:30");
+// STRICT DEADLINE: August 21, 2026 at 6:30 PM IST
+export const REGISTRATION_DEADLINE = new Date("2026-08-21T18:30:00+05:30");

@@ -13,7 +13,13 @@ import Image from "next/image";
 import sihLogo from "@/app/images/SIH-Logo.png";
 import sxcLogo from "@/app/images/sxclogo.jpg";
 
-const NAV_LINKS = [
+interface NavLink {
+  href: string;
+  label: string;
+  highlight?: boolean;
+}
+
+const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/guidelines", label: "Guidelines" },
 ];

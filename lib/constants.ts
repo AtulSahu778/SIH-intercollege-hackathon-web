@@ -50,7 +50,7 @@ export const TIMELINE = [
   {
     id: 3,
     phase: "Internal Hackathon",
-    date: "Sep 20–21, 2026",
+    date: "Sep 7, 2026",
     description: "24-hour on-campus hackathon. All registered teams participate.",
     status: "upcoming",
     icon: "Zap",
@@ -241,5 +241,9 @@ export const ADMIN_SESSION_KEY = "sxc_sih_admin_session";
 // ─────────────────────────────────────────────────────────────────────────────
 // Registration Deadline
 // ─────────────────────────────────────────────────────────────────────────────
-// STRICT DEADLINE: August 21, 2026 at 6:30 PM IST
+// STRICT DEADLINE: August 21, 2026 at 6:30 PM IST — DEADLINE HAS PASSED.
 export const REGISTRATION_DEADLINE = new Date("2026-08-21T18:30:00+05:30");
+
+// Set to true to hard-close the portal immediately, regardless of current time.
+// Flipped ON at 6:30 PM IST on August 21, 2026.
+export const PORTAL_CLOSED = true;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import IdeaSubmission from "@/components/registration/IdeaSubmission";
-import { COLLEGE, HACKATHON } from "@/lib/constants";
+import RegistrationClosed from "@/components/registration/RegistrationClosed";
+import { COLLEGE, HACKATHON, PORTAL_CLOSED } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: `Submit Your Idea — ${HACKATHON.name}`,
@@ -26,15 +27,16 @@ export default function SubmitIdeaPage() {
             </h1>
             <p className="mt-2 text-xs sm:text-sm md:text-base text-white/70 leading-relaxed max-w-xl">
               Registered teams can submit their idea details using their assigned{" "}
-              <span className="text-white font-semibold">SIH Team ID</span>. No PPT upload required — just your idea.
+              <span className="text-white font-semibold">SIH Team ID</span>.
+              No PPT upload required — just your idea.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Submission Form Body */}
-      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <IdeaSubmission />
+      {/* Body */}
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {PORTAL_CLOSED ? <RegistrationClosed /> : <IdeaSubmission />}
       </div>
     </div>
   );

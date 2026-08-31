@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     const fallbackRes = await fetch(fallbackUrl, { cache: "no-store", redirect: "follow" });
     const fallbackText = await fallbackRes.text();
     
-    let fallbackData: { data?: { teamId?: string; teamName?: string }[] } | null = null;
+    let fallbackData: { data?: { teamId?: string; teamName?: string; presentationUrl?: string; problemStatement?: string; ideaTitle?: string }[] } | null = null;
     try {
       fallbackData = JSON.parse(fallbackText);
     } catch {

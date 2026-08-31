@@ -7,6 +7,7 @@ import sihLogo from "@/app/images/SIH2026-logo.png";
 const FOOTER_LINKS = [
   { label: "Home", href: "/" },
   { label: "Guidelines", href: "/guidelines" },
+  { label: "Upload Presentation", href: "/pptupload" },
   { label: "Admin Dashboard", href: "/admin" },
 ];
 

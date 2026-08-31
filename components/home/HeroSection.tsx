@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, type Variants } from "framer-motion";
 import Link from "next/link";
-import { ScrollText, Zap, Timer } from "lucide-react";
+import { ScrollText, Zap, Timer, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import pmBanner from "@/app/images/sih2025-slider-banner-PM-Banner2.png";
@@ -217,6 +217,17 @@ export default function HeroSection() {
               variants={itemVariants}
               className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-4 w-full sm:w-auto"
             >
+              <Button
+                asChild
+                size="xl"
+                className="w-full sm:w-auto bg-gradient-to-r from-accent-orange via-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/30 active:scale-98 transition-all duration-200"
+              >
+                <Link href="/pptupload" className="flex items-center justify-center gap-2.5">
+                  <Upload className="w-5 h-5 text-white" />
+                  <span>Upload Presentation</span>
+                </Link>
+              </Button>
+
               <Button
                 asChild
                 size="xl"

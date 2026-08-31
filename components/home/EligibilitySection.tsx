@@ -128,7 +128,13 @@ export default function EligibilitySection() {
 
             {/* CTA */}
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Button asChild variant="outline" size="lg">
+              <Button asChild size="lg" className="bg-navy-primary hover:bg-navy-secondary text-white font-bold rounded-xl shadow-md">
+                <Link href="/pptupload" className="flex items-center gap-2">
+                  <span>Upload Presentation</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-xl">
                 <Link href="/guidelines">
                   Read Full Guidelines
                 </Link>

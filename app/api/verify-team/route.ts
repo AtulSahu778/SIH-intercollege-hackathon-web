@@ -71,9 +71,12 @@ export async function GET(req: NextRequest) {
       );
 
       if (match) {
+        const isPresentationUploaded = Boolean(match.presentationUrl && match.presentationUrl.trim() !== "");
         const result = {
           success: true,
           exists: true,
+          alreadyUploadedPresentation: isPresentationUploaded,
+          alreadySubmittedIdea: Boolean(match.problemStatement || match.ideaTitle),
           alreadySubmitted: false,
           teamName: match.teamName || "Registered Team",
         };

@@ -18,15 +18,16 @@
  *   - "Registrations"  — Stores team information and approval status
  *   - "Team Members"   — Stores leader and member details
  *   - "Teams Idea"     — Stores submitted project ideas
- *   - "Uploads"        — Presentation file links (optional)
+ *   - "Uploads"        — Presentation file links
  *   - "Auth Letters"   — Authorization letter links (legacy)
  *
  * ACTIONS (POST):
- *   register         — Register a new team
- *   submitIdea       — Submit idea details (saved into "Teams Idea" sheet)
- *   updateStatus     — Admin: update team approval status
- *   verifyTeamId     — Verify a team ID exists
- *   uploadAuthLetter — (Legacy) Upload authorization letter PDF
+ *   register              — Register a new team
+ *   submitIdea            — Submit idea details (saved into "Teams Idea" sheet)
+ *   updateStatus          — Admin: update team approval status
+ *   verifyTeamId          — Verify a team ID exists
+ *   uploadPresentation    — Upload SIH idea presentation (PPT/PPTX/PDF) to Drive
+ *   uploadAuthLetter      — (Legacy) Upload authorization letter PDF
  *
  * ACTIONS (GET):
  *   getRegistrations — Fetch all teams (Admin dashboard)
@@ -91,11 +92,12 @@ function doPost(e) {
 
     const action = body.action || (e && e.parameter && e.parameter.action);
 
-    if (action === "register")         return corsResponse(registerTeam(body));
-    if (action === "submitIdea")       return corsResponse(submitIdeaForTeam(body));
-    if (action === "updateStatus")     return corsResponse(updateStatus(body.teamId, body.status));
-    if (action === "verifyTeamId")     return corsResponse(verifyTeamId(body.teamId || (e && e.parameter && e.parameter.teamId)));
-    if (action === "uploadAuthLetter") return corsResponse(uploadAuthLetterForTeam(body));
+    if (action === "register")              return corsResponse(registerTeam(body));
+    if (action === "submitIdea")            return corsResponse(submitIdeaForTeam(body));
+    if (action === "updateStatus")          return corsResponse(updateStatus(body.teamId, body.status));
+    if (action === "verifyTeamId")          return corsResponse(verifyTeamId(body.teamId || (e && e.parameter && e.parameter.teamId)));
+    if (action === "uploadPresentation")    return corsResponse(uploadPresentationForTeam(body));
+    if (action === "uploadAuthLetter")      return corsResponse(uploadAuthLetterForTeam(body));
 
     return corsResponse({ success: false, error: "Unknown action: " + action });
   } catch (err) {
@@ -301,10 +303,30 @@ function getRegistrations() {
     };
   }
 
-  // Build uploads lookup
+  // Build uploads lookup (supports both [Timestamp, TeamID, TeamName, URL] and legacy [TeamID, URL, Time])
   var uploadsByTeam = {};
   for (var j = 1; j < uploadsData.length; j++) {
-    uploadsByTeam[uploadsData[j][0]] = uploadsData[j][1];
+    var uRow = uploadsData[j];
+    var uTid = "";
+    var uUrl = "";
+
+    var col0 = String(uRow[0] || "").trim().toUpperCase();
+    var col1 = String(uRow[1] || "").trim().toUpperCase();
+
+    if (col1.startsWith("SIH-")) {
+      uTid = col1;
+      uUrl = uRow[3] || uRow[2] || "";
+    } else if (col0.startsWith("SIH-")) {
+      uTid = col0;
+      uUrl = uRow[3] || uRow[2] || uRow[1] || "";
+    } else {
+      uTid = col0 || col1;
+      uUrl = uRow[3] || uRow[2] || uRow[1] || "";
+    }
+
+    if (uTid) {
+      uploadsByTeam[uTid] = uUrl;
+    }
   }
 
   // Build registrations array
@@ -405,7 +427,21 @@ function verifyTeamId(teamId) {
       }
     }
 
-    // 3. Auth Letters sheet (legacy)
+    // 3. Uploads sheet — check if presentation already submitted
+    var uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+    var uploadsData  = uploadsSheet.getDataRange().getValues();
+    var presentationAlreadyUploaded = false;
+
+    for (var p = 1; p < uploadsData.length; p++) {
+      var id0 = String(uploadsData[p][0] || "").trim().toUpperCase();
+      var id1 = String(uploadsData[p][1] || "").trim().toUpperCase();
+      if (id0 === normId || id1 === normId) {
+        presentationAlreadyUploaded = true;
+        break;
+      }
+    }
+
+    // 4. Auth Letters sheet (legacy)
     var authSheet = getSheet(SHEET_NAMES.AUTH_LETTERS);
     var authData  = authSheet.getDataRange().getValues();
     var authLetterSubmitted = false;
@@ -418,14 +454,80 @@ function verifyTeamId(teamId) {
     }
 
     return {
-      success:              true,
-      exists:               true,
-      teamName:             teamName,
-      alreadySubmittedIdea: ideaAlreadySubmitted,
-      alreadySubmitted:     authLetterSubmitted,
+      success:                     true,
+      exists:                      true,
+      teamName:                    teamName,
+      alreadySubmittedIdea:        ideaAlreadySubmitted,
+      alreadyUploadedPresentation: presentationAlreadyUploaded,
+      alreadySubmitted:            authLetterSubmitted,
     };
   } catch (err) {
     return { success: false, error: "Error verifying team: " + String(err) };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UPLOAD PRESENTATION (PPT / PPTX / PDF) TO DRIVE
+// ─────────────────────────────────────────────────────────────────────────────
+function uploadPresentationForTeam(data) {
+  var teamId   = data.teamId;
+  var base64   = data.base64;
+  var fileName = data.fileName;
+  var mimeType = data.mimeType || "application/octet-stream";
+
+  if (!teamId || !base64 || !fileName) {
+    return { success: false, error: "teamId, base64, and fileName are required." };
+  }
+
+  var normId = String(teamId).trim().toUpperCase();
+  var verify = verifyTeamId(normId);
+
+  if (!verify.exists) {
+    return { success: false, error: verify.error || "Team not found." };
+  }
+
+  if (verify.alreadyUploadedPresentation) {
+    return {
+      success: false,
+      alreadySubmitted: true,
+      alreadyUploadedPresentation: true,
+      error: "Team " + (verify.teamName || normId) + " (" + normId + ") has already submitted a presentation. Re-uploads and modifications are locked.",
+    };
+  }
+
+  var teamName = verify.teamName || "";
+
+  // Double-check directly against Uploads sheet (race-condition guard)
+  var uploadsSheet = getSheet(SHEET_NAMES.UPLOADS);
+  var existingData = uploadsSheet.getDataRange().getValues();
+  for (var i = 1; i < existingData.length; i++) {
+    var c0 = String(existingData[i][0] || "").trim().toUpperCase();
+    var c1 = String(existingData[i][1] || "").trim().toUpperCase();
+    if (c0 === normId || c1 === normId) {
+      return {
+        success: false,
+        alreadySubmitted: true,
+        alreadyUploadedPresentation: true,
+        error: "Team " + (teamName || normId) + " (" + normId + ") has already submitted a presentation. Re-uploads and modifications are locked.",
+      };
+    }
+  }
+
+  var timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  try {
+    var fileUrl = uploadPresentationToFolder(base64, fileName, normId, mimeType, DRIVE_FOLDER_ID);
+    uploadsSheet.appendRow([timestamp, normId, teamName, fileUrl]);
+    console.log("Presentation uploaded for team:", normId, "- Team Name:", teamName, "- File:", fileName, "- URL:", fileUrl);
+    return {
+      success: true,
+      message: "Presentation submitted successfully.",
+      url: fileUrl,
+      teamId: normId,
+      teamName: teamName,
+    };
+  } catch (err) {
+    console.error("uploadPresentationForTeam error:", String(err));
+    return { success: false, error: "Failed to upload presentation. Please try again." };
   }
 }
 
@@ -467,7 +569,22 @@ function uploadAuthLetterForTeam(data) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// UPLOAD PDF TO DRIVE
+// UPLOAD PRESENTATION FILE TO DRIVE (PPT / PPTX / PDF — with correct MIME)
+// ─────────────────────────────────────────────────────────────────────────────
+function uploadPresentationToFolder(base64Data, fileName, teamId, mimeType, folderId) {
+  if (folderId.indexOf("/folders/") !== -1) {
+    folderId = folderId.split("/folders/")[1].split("?")[0].split("/")[0];
+  }
+  var folder  = DriveApp.getFolderById(folderId);
+  var decoded = Utilities.base64Decode(base64Data);
+  var blob    = Utilities.newBlob(decoded, mimeType, teamId + "_" + fileName);
+  var file    = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return file.getUrl();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UPLOAD PDF TO DRIVE (legacy helper — kept for backward compatibility)
 // ─────────────────────────────────────────────────────────────────────────────
 function uploadPDF(base64Data, fileName, teamId) {
   var folderId = DRIVE_FOLDER_ID;
@@ -536,7 +653,7 @@ function setupSheetHeaders(sheet, name) {
     "Category", "Problem Statement", "Idea Title", "Idea Description",
   ];
   headers[SHEET_NAMES.UPLOADS] = [
-    "Team ID", "Presentation PDF URL", "Submission Time",
+    "Timestamp", "Team ID", "Team Name", "Presentation File URL",
   ];
   headers[SHEET_NAMES.AUTH_LETTERS] = [
     "Team ID", "Authorization Letter URL", "Submission Time",

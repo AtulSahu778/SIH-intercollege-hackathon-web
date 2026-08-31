@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { COLLEGE, HACKATHON, TEMPLATE } from "@/lib/constants";
 import {
   Accordion, AccordionItem, AccordionTrigger, AccordionContent
@@ -6,7 +8,7 @@ import {
 import {
   Users, ClipboardCheck, Star, BarChart3, HelpCircle,
   BookOpen, CheckCircle2, AlertCircle, Download, FileText,
-  Calendar, ListChecks, Code2, Cpu
+  Calendar, ListChecks, Code2, Cpu, Upload
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -369,14 +371,22 @@ export default function GuidelinesPage() {
                 </p>
               </div>
             </div>
-            <a
-              href={TEMPLATE.downloadUrl}
-              download={TEMPLATE.filename}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-semibold text-sm shadow-md transition-all duration-200 flex-shrink-0 group"
-            >
-              <Download className="w-4 h-4 text-accent-cyan group-hover:translate-y-0.5 transition-transform" />
-              <span>Download Template (.pptx)</span>
-            </a>
+            <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto flex-shrink-0">
+              <a
+                href={TEMPLATE.downloadUrl}
+                download={TEMPLATE.filename}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-all duration-200 flex-shrink-0 group"
+              >
+                <Download className="w-4 h-4 text-slate-600 group-hover:translate-y-0.5 transition-transform" />
+                <span>Download (.pptx)</span>
+              </a>
+              <Button asChild size="lg" className="w-full sm:w-auto bg-accent-orange hover:bg-orange-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/20 px-5">
+                <Link href="/pptupload" className="flex items-center justify-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  <span>Upload PPT</span>
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -402,14 +412,19 @@ export default function GuidelinesPage() {
         </Accordion>
 
         {/* Bottom CTA */}
-        <div className="mt-12 p-6 rounded-2xl bg-gradient-to-br from-navy-primary to-navy-secondary text-white text-center relative overflow-hidden">
+        <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-navy-primary to-navy-secondary text-white text-center relative overflow-hidden">
           <div className="absolute inset-0 grid-pattern opacity-30" />
-          <div className="relative">
-            <h2 className="font-black text-xl mb-2">Ready to Innovate?</h2>
-            <p className="text-white/60 text-sm">
-              Registration is now closed. Stay tuned for updates on the internal hackathon
-              scheduled for September 7, 2026.
+          <div className="relative max-w-md mx-auto">
+            <h2 className="font-black text-xl mb-2">Ready to Upload Your Presentation?</h2>
+            <p className="text-white/60 text-sm mb-6">
+              Registered teams can now upload their official SIH idea presentation PPT or PDF.
             </p>
+            <Button asChild size="lg" className="bg-accent-orange hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-500/20 px-8">
+              <Link href="/pptupload" className="flex items-center justify-center gap-2">
+                <Upload className="w-4 h-4" />
+                <span>Upload Presentation</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

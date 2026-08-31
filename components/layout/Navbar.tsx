@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronRight, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { COLLEGE, HACKATHON } from "@/lib/constants";
@@ -22,6 +22,7 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/guidelines", label: "Guidelines" },
+  { href: "/pptupload", label: "Upload PPT", highlight: true },
 ];
 
 export default function Navbar() {
@@ -107,10 +108,10 @@ export default function Navbar() {
               {NAV_LINKS.map((link) => {
                 if (link.highlight) {
                   return (
-                    <Button key={link.href} asChild variant="default" size="sm" className="ml-2">
-                      <Link href={link.href}>
-                        {link.label}
-                        <ChevronRight className="w-4 h-4" />
+                    <Button key={link.href} asChild size="sm" className="ml-2 bg-accent-orange hover:bg-orange-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/20 px-4">
+                      <Link href={link.href} className="flex items-center gap-1.5">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{link.label}</span>
                       </Link>
                     </Button>
                   );

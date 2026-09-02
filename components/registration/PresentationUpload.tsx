@@ -122,19 +122,19 @@ function FileDropzone({
           <FileCheck2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-bold text-emerald-900 truncate">{file.name}</p>
-          <p className="text-[11px] sm:text-xs text-emerald-700/80 mt-0.5">
+          <p className="text-sm sm:text-base font-bold text-emerald-900 truncate">{file.name}</p>
+          <p className="text-xs text-emerald-700/90 mt-0.5 leading-tight">
             {(file.size / (1024 * 1024)).toFixed(2)} MB · {getFileTypeLabel(file)} · Ready to submit
           </p>
         </div>
         <button
           type="button"
           onClick={onClear}
-          className="p-1.5 sm:p-2 rounded-xl hover:bg-emerald-100 text-emerald-600 hover:text-emerald-800 transition-colors flex-shrink-0"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl hover:bg-emerald-100 text-emerald-600 hover:text-emerald-800 transition-colors flex items-center justify-center flex-shrink-0"
           title="Remove file"
           aria-label="Remove file"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
     );
@@ -149,7 +149,7 @@ function FileDropzone({
       }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={onDrop}
-      className={`group cursor-pointer rounded-2xl border-2 border-dashed p-6 sm:p-10 text-center transition-all duration-200 flex flex-col items-center justify-center ${
+      className={`group cursor-pointer rounded-2xl border-2 border-dashed p-5 sm:p-10 text-center transition-all duration-200 flex flex-col items-center justify-center ${
         isDragging
           ? "border-accent-orange bg-orange-50/60 scale-[1.01]"
           : "border-slate-200 bg-slate-50/60 hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100"
@@ -168,10 +168,10 @@ function FileDropzone({
       <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-200">
         <CloudUpload className={`w-6 h-6 sm:w-7 sm:h-7 transition-colors duration-200 ${isDragging ? "text-accent-orange" : "text-slate-400 group-hover:text-navy-primary"}`} />
       </div>
-      <p className="text-xs sm:text-sm font-bold text-slate-800 mb-1">
+      <p className="text-sm sm:text-base font-bold text-slate-800 mb-1">
         Tap to browse or drop your presentation
       </p>
-      <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
+      <p className="text-xs sm:text-sm text-slate-500 font-medium">
         PPT, PPTX or PDF · Maximum {MAX_SIZE_MB} MB
       </p>
 
@@ -180,7 +180,7 @@ function FileDropzone({
         {[".pptx", ".ppt", ".pdf"].map((ext) => (
           <span
             key={ext}
-            className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-mono font-semibold"
+            className="px-2.5 py-0.5 sm:py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-mono font-semibold"
           >
             {ext}
           </span>
@@ -302,21 +302,31 @@ export default function PresentationUpload() {
     <div className="max-w-xl mx-auto w-full">
       {/* Step Indicator Header */}
       {step !== "done" && step !== "already-submitted" && (
-        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-          <div className={`flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-full transition-colors duration-200 ${
-            step === "verify" ? "bg-navy-primary text-white" : "bg-emerald-50 text-emerald-700"
+        <div className="flex items-center justify-center gap-1.5 sm:gap-3 mb-6 sm:mb-8 px-1">
+          <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold px-3 sm:px-4 py-1.5 rounded-full transition-colors duration-200 ${
+            step === "verify" ? "bg-navy-primary text-white shadow-sm" : "bg-emerald-50 text-emerald-700"
           }`}>
-            {step === "upload" ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <span className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px]">1</span>}
-            <span>1. Enter Team ID</span>
+            {step === "upload" ? (
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
+            ) : (
+              <span className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0">1</span>
+            )}
+            <span className="whitespace-nowrap">
+              <span className="inline sm:hidden">1. Team ID</span>
+              <span className="hidden sm:inline">1. Enter Team ID</span>
+            </span>
           </div>
-          <div className="w-4 sm:w-6 h-0.5 bg-slate-200" />
-          <div className={`flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-full transition-colors duration-200 ${
-            step === "upload" ? "bg-navy-primary text-white" : "bg-slate-100 text-slate-400"
+          <div className="w-3 sm:w-6 h-0.5 bg-slate-200 flex-shrink-0" />
+          <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold px-3 sm:px-4 py-1.5 rounded-full transition-colors duration-200 ${
+            step === "upload" ? "bg-navy-primary text-white shadow-sm" : "bg-slate-100 text-slate-400"
           }`}>
-            <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+            <span className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold flex-shrink-0 ${
               step === "upload" ? "bg-white/20 text-white" : "bg-slate-200 text-slate-500"
             }`}>2</span>
-            <span>2. Upload Presentation</span>
+            <span className="whitespace-nowrap">
+              <span className="inline sm:hidden">2. Upload PPT</span>
+              <span className="hidden sm:inline">2. Upload Presentation</span>
+            </span>
           </div>
         </div>
       )}
@@ -336,21 +346,21 @@ export default function PresentationUpload() {
             {/* Download Template Strip */}
             <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-50 text-accent-orange flex items-center justify-center flex-shrink-0">
-                  <FileType2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-orange-50 text-accent-orange flex items-center justify-center flex-shrink-0">
+                  <FileType2 className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+                  <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
                     Official SIH Presentation Template
                   </h2>
-                  <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1 leading-snug">
                     Download, fill in your idea, and upload as PPT or PDF
                   </p>
                 </div>
               </div>
-              <Button asChild size="sm" variant="outline" className="rounded-xl font-bold text-xs shrink-0 w-full sm:w-auto h-10 sm:h-9 hover:bg-slate-50">
+              <Button asChild size="sm" variant="outline" className="rounded-xl font-bold text-xs sm:text-sm shrink-0 w-full sm:w-auto h-10 sm:h-9 hover:bg-slate-50">
                 <a href={TEMPLATE.downloadUrl} download>
-                  <Download className="w-3.5 h-3.5 mr-1.5" />
+                  <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
                   Download Template
                 </a>
               </Button>
@@ -362,15 +372,15 @@ export default function PresentationUpload() {
                 <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-navy-primary/5 text-navy-primary flex items-center justify-center mx-auto mb-2.5 sm:mb-3">
                   <KeyRound className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900">
+                <h2 className="text-lg sm:text-xl font-bold sm:font-black text-slate-900">
                   Enter Your SIH Team ID
                 </h2>
-                <p className="text-[11px] sm:text-xs text-slate-500 mt-1">
+                <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-1.5 max-w-sm mx-auto">
                   Enter the unique Team ID assigned during your registration
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3.5 sm:space-y-4">
                 <div className="relative">
                   <input
                     type="text"
@@ -394,8 +404,8 @@ export default function PresentationUpload() {
                 </div>
 
                 {verifyError && (
-                  <p className="flex items-center justify-center gap-1.5 text-xs text-red-600 font-medium text-center">
-                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <p className="flex items-center justify-center gap-1.5 text-xs sm:text-sm text-red-600 font-medium text-center px-1">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     {verifyError}
                   </p>
                 )}
@@ -405,7 +415,7 @@ export default function PresentationUpload() {
                   onClick={handleVerify}
                   disabled={isVerifying || !teamIdInput.trim()}
                   size="lg"
-                  className="w-full h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-bold shadow-md shadow-navy-primary/10 disabled:opacity-50 transition-all duration-200 text-sm"
+                  className="w-full h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-bold shadow-md shadow-navy-primary/10 disabled:opacity-50 transition-all duration-200 text-sm sm:text-base"
                 >
                   {isVerifying ? (
                     <>
@@ -441,9 +451,9 @@ export default function PresentationUpload() {
                   <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] sm:text-xs text-slate-500 font-medium leading-none">Verified Team</p>
-                  <p className="text-xs sm:text-sm font-bold text-slate-900 truncate mt-0.5">
-                    {verified.teamName} <span className="font-mono text-[11px] sm:text-xs font-normal text-slate-500">({verified.teamId})</span>
+                  <p className="text-xs text-slate-500 font-semibold leading-none">Verified Team</p>
+                  <p className="text-sm sm:text-base font-bold text-slate-900 truncate mt-1">
+                    {verified.teamName} <span className="font-mono text-xs sm:text-sm font-normal text-slate-500">({verified.teamId})</span>
                   </p>
                 </div>
               </div>
@@ -453,7 +463,7 @@ export default function PresentationUpload() {
                   setStep("verify");
                   setFile(null);
                 }}
-                className="text-xs text-slate-500 hover:text-navy-primary font-semibold px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors flex-shrink-0"
+                className="text-xs sm:text-sm text-slate-500 hover:text-navy-primary font-semibold px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors flex-shrink-0"
               >
                 Change
               </button>
@@ -462,21 +472,21 @@ export default function PresentationUpload() {
             {/* Upload Card */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 shadow-md space-y-4 sm:space-y-5">
               <div>
-                <h2 className="text-sm sm:text-base font-bold text-slate-900 mb-1">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-1">
                   Upload SIH Idea Presentation
                 </h2>
-                <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">
-                  Upload your completed presentation using the official SIH template. Accepted formats: <span className="font-mono font-semibold">PPT, PPTX, PDF</span> (max {MAX_SIZE_MB} MB).
+                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                  Upload your completed presentation using the official SIH template. Accepted formats: <span className="font-mono font-semibold text-slate-700">PPT, PPTX, PDF</span> (max {MAX_SIZE_MB} MB).
                 </p>
               </div>
 
               <FileDropzone file={file} onFile={setFile} onClear={() => setFile(null)} />
 
               {/* Important notice */}
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-100">
-                <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                <p className="text-[11px] sm:text-xs text-amber-800 leading-relaxed font-medium">
-                  <strong>One-time submission:</strong> Re-uploading or modifying presentations after submission is locked to maintain contest integrity.
+              <div className="flex items-start gap-2.5 p-3 sm:p-3.5 rounded-xl bg-amber-50/70 border border-amber-100">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs sm:text-sm text-amber-900 leading-relaxed font-medium">
+                  <strong className="font-semibold text-amber-950">One-time submission:</strong> Re-uploading or modifying presentations after submission is locked to maintain contest integrity.
                 </p>
               </div>
 
@@ -486,7 +496,7 @@ export default function PresentationUpload() {
                   variant="outline"
                   size="lg"
                   onClick={() => setStep("verify")}
-                  className="rounded-xl px-3.5 sm:px-4 font-semibold text-slate-600 h-12 text-xs sm:text-sm flex-shrink-0"
+                  className="rounded-xl px-3.5 sm:px-5 font-semibold text-slate-600 h-12 text-sm sm:text-base flex-shrink-0"
                 >
                   <ArrowLeft className="w-4 h-4 mr-1 sm:mr-1.5" />
                   Back
@@ -497,7 +507,7 @@ export default function PresentationUpload() {
                   onClick={handleUpload}
                   disabled={!file || isUploading}
                   size="lg"
-                  className="flex-1 h-12 rounded-xl bg-accent-orange hover:bg-orange-600 text-white font-bold shadow-lg shadow-orange-500/20 disabled:opacity-50 transition-all duration-200 text-xs sm:text-sm"
+                  className="flex-1 h-12 rounded-xl bg-accent-orange hover:bg-orange-600 text-white font-bold shadow-lg shadow-orange-500/20 disabled:opacity-50 transition-all duration-200 text-sm sm:text-base"
                 >
                   {isUploading ? (
                     <>
@@ -530,7 +540,7 @@ export default function PresentationUpload() {
             </div>
 
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-wider mb-2.5">
                 Submission Locked
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">
@@ -539,12 +549,12 @@ export default function PresentationUpload() {
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 max-w-md mx-auto text-left">
-              <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Submitted For</p>
-              <p className="text-base font-bold text-slate-900 mt-0.5">{alreadySubmittedTeam.teamName}</p>
-              <p className="text-xs font-mono text-slate-600 mt-0.5">Team ID: {alreadySubmittedTeam.teamId}</p>
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Submitted For</p>
+              <p className="text-base sm:text-lg font-bold text-slate-900 mt-0.5">{alreadySubmittedTeam.teamName}</p>
+              <p className="text-xs sm:text-sm font-mono text-slate-600 mt-0.5">Team ID: {alreadySubmittedTeam.teamId}</p>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm md:text-base text-slate-600 max-w-md mx-auto leading-relaxed">
               Your presentation file has already been safely uploaded to Google Drive and recorded in the evaluation database.
               To maintain the integrity of the evaluation process, <strong>teams are not permitted to re-upload or overwrite existing submissions</strong>.
             </p>
@@ -559,12 +569,12 @@ export default function PresentationUpload() {
                   setVerifyError("");
                   setStep("verify");
                 }}
-                className="w-full sm:w-auto h-11 rounded-xl font-semibold text-xs sm:text-sm"
+                className="w-full sm:w-auto h-11 sm:h-12 rounded-xl font-semibold text-sm sm:text-base"
               >
                 Check Another Team ID
               </Button>
 
-              <Button asChild className="w-full sm:w-auto h-11 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-bold px-6 text-xs sm:text-sm">
+              <Button asChild className="w-full sm:w-auto h-11 sm:h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-bold px-6 text-sm sm:text-base">
                 <Link href="/">
                   Return to Home
                 </Link>
@@ -588,20 +598,20 @@ export default function PresentationUpload() {
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-2">
               Presentation Submitted!
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed mb-5 sm:mb-6">
+            <p className="text-xs sm:text-sm md:text-base text-slate-600 max-w-md mx-auto leading-relaxed mb-5 sm:mb-6">
               The SIH presentation for team{" "}
               <strong className="text-slate-900">{verified.teamName}</strong> (
               <span className="font-mono font-semibold text-slate-800">{verified.teamId}</span>
               ) has been securely saved to Google Drive and recorded in our system.
             </p>
 
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[11px] sm:text-xs font-semibold mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs sm:text-sm font-semibold mb-6 sm:mb-8">
               <Presentation className="w-3.5 h-3.5 text-emerald-600" />
               Recorded on {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
             </div>
 
             <div>
-              <Button asChild size="lg" className="w-full sm:w-auto h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-bold px-8 text-sm">
+              <Button asChild size="lg" className="w-full sm:w-auto h-12 rounded-xl bg-navy-primary hover:bg-navy-secondary text-white font-bold px-8 text-sm sm:text-base">
                 <Link href="/">
                   Return to Home
                 </Link>

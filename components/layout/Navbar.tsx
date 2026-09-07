@@ -133,18 +133,6 @@ export default function Navbar() {
                 );
               })}
 
-              {/* Admin link */}
-              <Link
-                href="/admin"
-                className={cn(
-                  "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
-                  pathname === "/admin"
-                    ? "text-accent-orange bg-orange-50"
-                    : "text-text-muted hover:text-text-primary hover:bg-slate-50"
-                )}
-              >
-                Admin
-              </Link>
             </nav>
 
             {/* Mobile Hamburger */}
@@ -213,15 +201,7 @@ export default function Navbar() {
                     </Link>
                   </div>
                 ))}
-                <div className="pt-2.5 border-t border-slate-100 mt-2.5">
-                  <Link
-                    href="/admin"
-                    className="flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-text-muted hover:text-navy-primary hover:bg-slate-100/70 transition-all duration-200"
-                  >
-                    <span>Admin Dashboard</span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">Portal</span>
-                  </Link>
-                </div>
+
               </nav>
             </motion.div>
           </>

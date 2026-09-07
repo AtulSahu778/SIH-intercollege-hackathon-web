@@ -14,6 +14,10 @@ import { TEMPLATE } from "@/lib/constants";
 import { fileToBase64 } from "@/lib/api/appsScript";
 import Link from "next/link";
 
+// Client-side Apps Script URL — used to bypass Vercel's 4.5 MB body limit
+// by calling the script directly from the browser instead of through a Next.js route.
+const APPS_SCRIPT_URL = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || "";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -250,6 +254,10 @@ export default function PresentationUpload() {
   };
 
   // ── Upload Presentation ──────────────────────────────────────────────────
+  // We call Google Apps Script directly from the browser (bypassing the Next.js
+  // API route) to avoid Vercel's 4.5 MB serverless body limit. Using
+  // Content-Type: text/plain avoids a CORS preflight, making it a "simple"
+  // request that Apps Script accepts and responds to with CORS headers.
   const handleUpload = async () => {
     if (!file || !verified) return;
     setIsUploading(true);
@@ -261,6 +269,71 @@ export default function PresentationUpload() {
       const base64 = await fileToBase64(file);
       const mimeType = getMimeType(file);
 
+      // ── Direct-to-Apps-Script path (production / Vercel) ──────────────────
+      if (APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) {
+        const TIMEOUT_MS = 120_000;
+
+        const fetchPromise = fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "uploadPresentation",
+            teamId: verified.teamId,
+            base64,
+            fileName: file.name,
+            mimeType,
+          }),
+          redirect: "follow",
+        }).then(async (res) => {
+          const text = await res.text();
+          return { ok: res.ok, text };
+        });
+
+        const timeoutPromise = new Promise<"timeout">((resolve) =>
+          setTimeout(() => resolve("timeout"), TIMEOUT_MS)
+        );
+
+        toast.dismiss(toastId);
+        const result = await Promise.race([fetchPromise, timeoutPromise]);
+
+        // Timeout → treat as success (Apps Script is still processing)
+        if (result === "timeout") {
+          setStep("done");
+          return;
+        }
+
+        // Bad HTTP / HTML error page from Apps Script
+        if (!result.ok || result.text.trim().startsWith("<!DOCTYPE") || result.text.trim().startsWith("<html")) {
+          console.error("Apps Script upload error:", result.text.slice(0, 200));
+          toast.error("Upload failed", { description: "Server error. Please try again." });
+          return;
+        }
+
+        let data: { success?: boolean; error?: string; alreadySubmitted?: boolean; alreadyUploadedPresentation?: boolean };
+        try {
+          data = JSON.parse(result.text);
+        } catch {
+          toast.error("Upload failed", { description: "Unexpected server response. Please try again." });
+          return;
+        }
+
+        if (data.success) {
+          setStep("done");
+        } else if (data.alreadySubmitted || data.alreadyUploadedPresentation) {
+          toast.error("Already Submitted", {
+            description: data.error || "Your team has already uploaded a presentation. Re-uploads are not permitted.",
+          });
+          setAlreadySubmittedTeam({ teamName: verified.teamName, teamId: verified.teamId });
+          setStep("already-submitted");
+        } else {
+          toast.error("Upload failed", {
+            description: data.error || "Please try again or contact management.",
+          });
+        }
+        return;
+      }
+
+      // ── Fallback: API route (dev / mock mode when URL not configured) ──────
       const res = await fetch("/api/upload-presentation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -280,19 +353,17 @@ export default function PresentationUpload() {
         toast.error("Already Submitted", {
           description: data.error || "Your team has already uploaded a presentation. Re-uploads are not permitted.",
         });
-        setAlreadySubmittedTeam({
-          teamName: verified.teamName,
-          teamId: verified.teamId,
-        });
+        setAlreadySubmittedTeam({ teamName: verified.teamName, teamId: verified.teamId });
         setStep("already-submitted");
       } else {
         toast.error("Upload failed", {
           description: data.error || "Please try again or contact management.",
         });
       }
-    } catch {
+    } catch (err) {
       toast.dismiss(toastId);
-      toast.error("Something went wrong", { description: "Please try again." });
+      console.error("Presentation upload error:", err);
+      toast.error("Upload failed", { description: "Network error. Please check your connection and try again." });
     } finally {
       setIsUploading(false);
     }

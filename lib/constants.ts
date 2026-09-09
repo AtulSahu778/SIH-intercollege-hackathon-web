@@ -247,3 +247,12 @@ export const REGISTRATION_DEADLINE = new Date("2026-08-21T18:30:00+05:30");
 // Set to true to hard-close the portal immediately, regardless of current time.
 // Flipped ON at 6:30 PM IST on August 21, 2026.
 export const PORTAL_CLOSED = true;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hackathon Conclusion Status
+// ─────────────────────────────────────────────────────────────────────────────
+// Close the site and show that the hackathon ended successfully on 9th September 2026.
+export const HACKATHON_ENDED = true;
+export const HACKATHON_ENDED_DATE = "9th September 2026";
+export const HACKATHON_ENDED_FULL_DATE = "September 9, 2026";
+

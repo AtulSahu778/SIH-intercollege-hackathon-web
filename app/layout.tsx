@@ -2,9 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import { COLLEGE, HACKATHON } from "@/lib/constants";
+import AppShell from "@/components/layout/AppShell";
+import { COLLEGE, HACKATHON, HACKATHON_ENDED, HACKATHON_ENDED_DATE } from "@/lib/constants";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,14 +13,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: `${HACKATHON.name} | ${COLLEGE.shortName}`,
+    default: HACKATHON_ENDED
+      ? `${HACKATHON.name} — Concluded Successfully | ${COLLEGE.shortName}`
+      : `${HACKATHON.name} | ${COLLEGE.shortName}`,
     template: `%s | iSIH 2026 — ${COLLEGE.shortName}`,
   },
-  description: `Register your team for the Internal Smart India Hackathon 2026 hosted by ${COLLEGE.name} in association with IQAC. Top teams will represent SXC at Smart India Hackathon 2026.`,
+  description: HACKATHON_ENDED
+    ? `The Internal Smart India Hackathon 2026 at ${COLLEGE.name} concluded successfully on ${HACKATHON_ENDED_DATE}. Review of projects and nominations for SIH 2026 national round are in progress.`
+    : `Register your team for the Internal Smart India Hackathon 2026 hosted by ${COLLEGE.name} in association with IQAC. Top teams will represent SXC at Smart India Hackathon 2026.`,
   keywords: [
     "Smart India Hackathon",
     "SIH 2026",
-    "Hackathon",
+    "Hackathon Concluded",
+    "Hackathon Ended",
     "St. Xavier's College Ranchi",
     "IQAC",
     "Internal Hackathon",
@@ -68,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B2545",
+  themeColor: "#FFFFFF",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -86,9 +90,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="font-sans antialiased bg-background text-text-primary">
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <AppShell>{children}</AppShell>
         <Toaster
           position="top-right"
           richColors
